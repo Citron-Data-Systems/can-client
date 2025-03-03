@@ -4,8 +4,9 @@ defmodule CanClient.MixProject do
   @app :can_client
   @version "0.1.0"
   @all_targets [
+    :host,
     :rpi5,
-    :citron_rpi5,
+    :citron_rpi5
   ]
 
   def project do
@@ -45,6 +46,9 @@ defmodule CanClient.MixProject do
       # Dependencies for all targets except :host
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
       {:vintage_net_wifi, "~> 0.12.0", targets: @all_targets},
+      {:cand, github: "valiot/cand", targets: @all_targets},
+      {:vintage_net_can, github: "valiot/vintage_net_can", targets: @all_targets},
+      {:phoenix_client, "~> 0.11.1"},
 
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
@@ -60,8 +64,11 @@ defmodule CanClient.MixProject do
       # {:nerves_system_rpi5, "~> 0.2", runtime: false, targets: :rpi5},
 
       # {:citron_system_rpi5, github: "Citron-Data-Systems/can-client", runtime: false, targets: :rpi5}
-      {:citron_system_rpi5, path: "../nerves_system_rpi5", runtime: false, targets: :citron_rpi5, nerves: [compile: true]},
-      {:vintage_net_can, github: "valiot/vintage_net_can", targets: @all_targets}
+      {:citron_system_rpi5,
+       path: "../nerves_system_rpi5",
+       runtime: false,
+       targets: :citron_rpi5,
+       nerves: [compile: true]},
 
       # {:nerves_system_bbb, "~> 2.19", runtime: false, targets: :bbb},
       # {:nerves_system_osd32mp1, "~> 0.15", runtime: false, targets: :osd32mp1},

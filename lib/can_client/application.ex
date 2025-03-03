@@ -12,6 +12,8 @@ defmodule CanClient.Application do
         # Children for all targets
         # Starts a worker by calling: CanClient.Worker.start_link(arg)
         # {CanClient.Worker, arg},
+
+        # {CanClient.FrameWriter, []}
       ] ++ target_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html

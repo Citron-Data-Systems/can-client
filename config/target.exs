@@ -70,6 +70,22 @@ config :vintage_net,
      }}
   ]
 
+# config :vintage_net,
+#   config: [
+#     {
+#       "can0",
+#       %{
+#         type: VintageNetCan,
+#         can: %{bitrate: 500_000},
+#         socket: %{
+#           port: 29536,
+#           can_interfaces: ["can0"],
+#           linked_interface: "lo"
+#         }
+#       }
+#     }
+#   ]
+
 config :mdns_lite,
   # The `hosts` key specifies what hostnames mdns_lite advertises.  `:hostname`
   # advertises the device's hostname.local. For the official Nerves systems, this
