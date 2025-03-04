@@ -3,6 +3,7 @@ defmodule CanClient.FrameWriter do
   require Logger
 
   @port 29536
+  @max_buf_len 50
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [])
@@ -21,7 +22,7 @@ defmodule CanClient.FrameWriter do
 
     send(self(), :setup)
 
-    {:ok, {nil, nil}}
+    {:ok, {nil, nil, []}}
   end
 
   defp channel_connection() do
@@ -47,36 +48,52 @@ defmodule CanClient.FrameWriter do
     socket
   end
 
-  def handle_info(:setup, socket) do
-    state = {channel_connection(), can_connection()}
+  defp dump_frames(channel, buf) do
+    b =
+      Enum.map(buf, fn
+        {:frame, {id, time, data}} ->
+          [id, time, data]
+
+        {:error, _} ->
+          []
+      end)
+      |> :erlang.term_to_binary(compressed: 9)
+
+    res =
+      PhoenixClient.Channel.push_async(
+        channel,
+        "frames",
+        %{
+          "frames" => Base.encode64(b)
+        }
+      )
+
+    Logger.info("Sent frames #{inspect(res)} #{byte_size(b)} bytes")
+  end
+
+  def handle_info(:setup, _socket) do
+    state = {channel_connection(), can_connection(), []}
     # let's begin
     send(self(), :tick)
     {:noreply, state}
   end
 
-  def handle_info(:tick, {channel, can}) do
+  def handle_info(:tick, {channel, can, buf}) do
     frames = Cand.Protocol.receive_frame(can)
     Logger.info("Got #{length(frames)} CAN frames")
 
-    to_send = Enum.flat_map(frames, fn
-      {:frame, {id, time, data}} ->
-        [%{id: id, time: time, data: Base.encode64(data)}]
+    buf = buf ++ frames
 
-      {:error, _} ->
+    buf =
+      if length(buf) > @max_buf_len do
+        dump_frames(channel, buf)
         []
-    end)
-
-    res = PhoenixClient.Channel.push_async(
-      channel,
-      "frames",
-      %{
-        "frames" => to_send
-      }
-    )
-    Logger.info("Sent frames: #{inspect res}")
+      else
+        buf
+      end
 
     send(self(), :tick)
-    {:noreply, {channel, can}}
+    {:noreply, {channel, can, buf}}
   end
 
   defp await_connected(socket, max_attempts, max_attempts) do
