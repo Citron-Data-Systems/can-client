@@ -27,16 +27,18 @@ defmodule CanClient.FrameWriter do
 
   defp channel_connection() do
     socket_opts = [
-      url: "ws://desktop.local/socket/websocket"
+      # url: "ws://desktop.local:4000/socket/websocket"
+      url: "wss://12cf6ca882b9.ngrok.app/socket/websocket"
     ]
 
     {:ok, socket} = PhoenixClient.Socket.start_link(socket_opts)
-    await_connected(socket, 0, 50)
 
-    topic = "can:veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006"
-    {:ok, _response, channel} = PhoenixClient.Channel.join(socket, topic)
+    with {:ok, socket} <- await_connected(socket, 0, 4) do
+      topic = "can:veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006"
+      {:ok, _response, channel} = PhoenixClient.Channel.join(socket, topic)
 
-    channel
+      {:ok, channel}
+    end
   end
 
   defp can_connection() do
@@ -71,11 +73,20 @@ defmodule CanClient.FrameWriter do
     Logger.info("Sent frames #{inspect(res)} #{byte_size(b)} bytes")
   end
 
-  def handle_info(:setup, _socket) do
-    state = {channel_connection(), can_connection(), []}
-    # let's begin
-    send(self(), :tick)
-    {:noreply, state}
+  def handle_info(:setup, state) do
+    case channel_connection() do
+      {:ok, channel} ->
+        state = {channel, can_connection(), []}
+        # let's begin
+        send(self(), :tick)
+        {:noreply, state}
+
+      {:error, e} ->
+        Logger.warn("Failed to connect to socket #{inspect(e)}")
+        send(self(), :setup)
+        Process.sleep(5_000)
+        {:noreply, state}
+    end
   end
 
   def handle_info(:tick, {channel, can, buf}) do
@@ -97,16 +108,16 @@ defmodule CanClient.FrameWriter do
   end
 
   defp await_connected(socket, max_attempts, max_attempts) do
-    raise RuntimeError, message: "Failed to connect to phx channel after #{max_attempts} tries"
+    {:error, "Failed to connect to phx channel after #{max_attempts} tries"}
   end
 
   defp await_connected(socket, attempts, max_attempts) do
     if not PhoenixClient.Socket.connected?(socket) do
-      Process.sleep(500)
-      Logger.info("Await connection")
+      Process.sleep(500 * attempts)
+      Logger.info("Await connection attempt #{attempts}/#{max_attempts}")
       await_connected(socket, attempts + 1, max_attempts)
     else
-      socket
+      {:ok, socket}
     end
   end
 end
