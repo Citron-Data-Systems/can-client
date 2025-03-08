@@ -27,7 +27,7 @@ defmodule CanClient.FrameWriter do
 
   defp channel_connection() do
     socket_opts = [
-      url: "wss://5bf6db8c56a8.ngrok.app/socket/websocket"
+      url: "ws://desktop.local/socket/websocket"
     ]
 
     {:ok, socket} = PhoenixClient.Socket.start_link(socket_opts)

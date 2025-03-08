@@ -49,7 +49,7 @@ defmodule CanClient.MixProject do
       {:cand, github: "valiot/cand", targets: @all_targets},
       {:vintage_net_can, github: "valiot/vintage_net_can", targets: @all_targets},
       {:phoenix_client, "~> 0.11.1"},
-
+      {:circuits_i2c, "~> 2.1"},
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang

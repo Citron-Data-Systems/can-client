@@ -23,16 +23,19 @@ gpu_mem=192
 
 # Enable I2C and SPI
 dtparam=i2c_arm=on
+# dtparam=i2c_vc=on
 dtparam=spi=on
 
 # Enable audio (loads snd_bcm3825)
 dtparam=audio=on
 
 # Automatically load overlays for detected cameras
-camera_auto_detect=1
-
+# dtoverlay=imx219,clock-frequency=24000000
+#dtoverlay=ov5647
+#dtoverlay=imx219
+#camera_auto_detect=1
 # Automatically load overlays for detected DSI displays
-display_auto_detect=1
+display_auto_detect=0
 
 # Enable DRM VC4 V3D driver
 dtoverlay=vc4-kms-v3d
