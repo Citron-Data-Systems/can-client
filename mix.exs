@@ -5,7 +5,7 @@ defmodule CanClient.MixProject do
   @version "0.1.0"
   @all_targets [
     :host,
-    :rpi5,
+    # :rpi5,
     :citron_rpi5
   ]
 

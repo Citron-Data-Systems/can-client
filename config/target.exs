@@ -59,7 +59,18 @@ config :vintage_net,
        type: VintageNetWiFi,
        vintage_net_wifi: %{
          networks: [
-           %{
+          %{
+            key_mgmt: :wpa_psk,
+            ssid: "chris_phone",
+            psk: "helloworld"
+          },
+          %{
+            key_mgmt: :wpa_psk,
+            ssid: "the_shed",
+            psk: "mia_likes_cookies"
+          },
+
+          %{
              key_mgmt: :wpa_psk,
              ssid: "outer_space",
              psk: "wubwubwub"
