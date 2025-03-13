@@ -4,6 +4,7 @@ import Config
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
 # configuring ring_logger.
 
+config :logger, level: :info
 config :logger, backends: [RingLogger]
 
 # Use shoehorn to start the main application. See the shoehorn

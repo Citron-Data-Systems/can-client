@@ -3,7 +3,6 @@ defmodule CanClient.FrameWriter do
   require Logger
 
   @port 29536
-  @max_buf_len 50
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [])
@@ -22,7 +21,7 @@ defmodule CanClient.FrameWriter do
 
     send(self(), :setup)
 
-    {:ok, {nil, nil, []}}
+    {:ok, {nil, nil}}
   end
 
   defp channel_connection() do
@@ -41,13 +40,23 @@ defmodule CanClient.FrameWriter do
     end
   end
 
-  defp can_connection() do
-    {:ok, socket} = Cand.Socket.start_link()
-    :hi = Cand.Socket.connect(socket, {127, 0, 0, 1}, @port)
+  def frame_loop(parent, socket) do
+    frames = Cand.Protocol.receive_frame(socket)
+    send(parent, {:frames, frames})
+    frame_loop(parent, socket)
+  end
 
-    [:ok] = Cand.Protocol.open(socket, "can0")
-    Cand.Protocol.raw_mode(socket)
-    socket
+  defp can_connection() do
+    parent = self()
+    spawn_link(fn ->
+      {:ok, socket} = Cand.Socket.start_link()
+      :hi = Cand.Socket.connect(socket, {127, 0, 0, 1}, @port)
+
+      [:ok] = Cand.Protocol.open(socket, "can0")
+      Cand.Protocol.raw_mode(socket)
+      frame_loop(parent, socket)
+
+    end)
   end
 
   defp dump_frames(channel, buf) do
@@ -76,38 +85,26 @@ defmodule CanClient.FrameWriter do
   def handle_info(:setup, state) do
     case channel_connection() do
       {:ok, channel} ->
-        state = {channel, can_connection(), []}
-        # let's begin
-        send(self(), :tick)
+        state = {channel, can_connection()}
         {:noreply, state}
 
       {:error, e} ->
-        Logger.warn("Failed to connect to socket #{inspect(e)}")
+        Logger.warning("Failed to connect to socket #{inspect(e)}")
         send(self(), :setup)
         Process.sleep(5_000)
         {:noreply, state}
     end
   end
 
-  def handle_info(:tick, {channel, can, buf}) do
-    frames = Cand.Protocol.receive_frame(can)
-    Logger.info("Got #{length(frames)} CAN frames")
-
-    buf = buf ++ frames
-
-    buf =
-      if length(buf) > @max_buf_len do
-        dump_frames(channel, buf)
-        []
-      else
-        buf
-      end
-
-    send(self(), :tick)
-    {:noreply, {channel, can, buf}}
+  def handle_info({:frames, buf}, {channel, can}) do
+    Logger.info(
+      "Got #{length(buf)} CAN frames #{inspect(Enum.map(buf, fn {:frame, {id, _, _}} -> id end))}"
+    )
+    dump_frames(channel, buf)
+    {:noreply, {channel, can}}
   end
 
-  defp await_connected(socket, max_attempts, max_attempts) do
+  defp await_connected(_socket, max_attempts, max_attempts) do
     {:error, "Failed to connect to phx channel after #{max_attempts} tries"}
   end
 
