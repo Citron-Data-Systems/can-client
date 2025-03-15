@@ -1,9 +1,10 @@
 %{
   "beam_notify": {:hex, :beam_notify, "1.1.1", "da7dd04f16120bcab71f01ff81607ea38ad78af859cd87fad2012eac8feab034", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "5a09fc8449171da423f781de16b95cdec52763e60308345de6f15358c2382a42"},
-  "cand": {:git, "https://github.com/valiot/cand.git", "488be80baed59c2239998f9591ca1c3d138744af", []},
+  "cand": {:git, "https://github.com/Citron-Data-Systems/cand.git", "f0c3a1ddfba044fb58a1fdbeb2fc3c98f000dfcb", []},
   "castore": {:hex, :castore, "1.0.12", "053f0e32700cbec356280c0e835df425a3be4bc1e0627b714330ad9d0f05497f", [:mix], [], "hexpm", "3dca286b2186055ba0c9449b4e95b97bf1b57b47c1f2644555879e659960c224"},
   "circuits_i2c": {:hex, :circuits_i2c, "2.1.0", "0656ea5d106744c498a8cd778f39c0685ab574e3da7159814cfbfe709001f0e5", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "3751a875a9d728080fdbc5fd352f728d4746a82e17e52f4444c406200349f6ac"},
   "circular_buffer": {:hex, :circular_buffer, "0.4.1", "477f370fd8cfe1787b0a1bade6208bbd274b34f1610e41f1180ba756a7679839", [:mix], [], "hexpm", "633ef2e059dde0d7b89bbab13b1da9d04c6685e80e68fbdf41282d4fae746b72"},
+  "delux": {:hex, :delux, "0.4.1", "9a8eb85101a189da8e2a318ffe6ae4da551b287ce261b0468e2634f85bb37141", [:mix], [], "hexpm", "d639eafd80c535a3bfd62e589b38e89cef9f5318c80903019711e29df8cd1439"},
   "elixir_make": {:hex, :elixir_make, "0.9.0", "6484b3cd8c0cee58f09f05ecaf1a140a8c97670671a6a0e7ab4dc326c3109726", [:mix], [], "hexpm", "db23d4fd8b757462ad02f8aa73431a426fe6671c80b200d9710caf3d1dd0ffdb"},
   "gen_state_machine": {:hex, :gen_state_machine, "3.0.0", "1e57f86a494e5c6b14137ebef26a7eb342b3b0070c7135f2d6768ed3f6b6cdff", [:mix], [], "hexpm", "0a59652574bebceb7309f6b749d2a41b45fdeda8dbb4da0791e355dd19f0ed15"},
   "jason": {:hex, :jason, "1.4.4", "b9226785a9aa77b6857ca22832cffa5d5011a667207eb2a0ad56adb5db443b8a", [:mix], [{:decimal, "~> 1.0 or ~> 2.0", [hex: :decimal, repo: "hexpm", optional: true]}], "hexpm", "c5eb0cab91f094599f94d55bc63409236a8ec69a21a67814529e8d5f6cc90b3b"},

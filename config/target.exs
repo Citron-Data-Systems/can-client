@@ -4,7 +4,19 @@ import Config
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
 # configuring ring_logger.
 
-config :logger, level: :info
+config :logger,
+  level: :info,
+  handle_otp_reports: true,
+  handle_sasl_reports: true
+
+config :logger, RingLogger,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [
+    :module,
+    :function,
+    :pid
+  ]
+
 config :logger, backends: [RingLogger]
 
 # Use shoehorn to start the main application. See the shoehorn
@@ -60,18 +72,18 @@ config :vintage_net,
        type: VintageNetWiFi,
        vintage_net_wifi: %{
          networks: [
-          %{
-            key_mgmt: :wpa_psk,
-            ssid: "chris_phone",
-            psk: "helloworld"
-          },
-          %{
-            key_mgmt: :wpa_psk,
-            ssid: "the_shed",
-            psk: "mia_likes_cookies"
-          },
+           # %{
+           #   key_mgmt: :wpa_psk,
+           #   ssid: "chris_phone",
+           #   psk: "helloworld"
+           # },
+           # %{
+           #   key_mgmt: :wpa_psk,
+           #   ssid: "the_shed",
+           #   psk: "mia_likes_cookies"
+           # },
 
-          %{
+           %{
              key_mgmt: :wpa_psk,
              ssid: "outer_space",
              psk: "wubwubwub"
