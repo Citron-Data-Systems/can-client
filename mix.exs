@@ -46,10 +46,11 @@ defmodule CanClient.MixProject do
       # Dependencies for all targets except :host
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
       {:vintage_net_wifi, "~> 0.12.0", targets: @all_targets},
-      {:cand, github: "valiot/cand", targets: @all_targets},
+      {:cand, github: "Citron-Data-Systems/cand", targets: @all_targets},
       {:vintage_net_can, github: "valiot/vintage_net_can", targets: @all_targets},
       {:phoenix_client, "~> 0.11.1"},
       {:circuits_i2c, "~> 2.1"},
+      {:delux, "~> 0.4.1"},
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
