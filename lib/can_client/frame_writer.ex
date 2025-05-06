@@ -4,6 +4,7 @@ defmodule CanClient.FrameWriter do
   require Logger
 
   @port 29536
+  @framebuf_size 200
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [])
@@ -25,18 +26,17 @@ defmodule CanClient.FrameWriter do
     {:ok, {nil, nil}}
   end
 
+  @vehicle_id "veh_b5229603-aa80-4f73-ba64-048a830a1a39"
   defp channel_connection() do
     socket_opts = [
-      url: "ws://192.168.1.232:4000/socket/websocket"
-      # url: "ws://desktop.local:4000/socket/websocket"
-      # url: "wss://12cf6ca882b9.ngrok.app/socket/websocket"
+      url: "wss://citron.systems/socket/websocket"
     ]
 
     Logger.info("Connecting to socket #{inspect(socket_opts)}")
     {:ok, socket} = PhoenixClient.Socket.start_link(socket_opts)
 
     with {:ok, socket} <- await_connected(socket, 0, 4) do
-      topic = "can:veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006"
+      topic = "can:#{@vehicle_id}"
       Logger.info("Connection to channel #{topic}")
       {:ok, _response, channel} = PhoenixClient.Channel.join(socket, topic)
 
@@ -44,10 +44,19 @@ defmodule CanClient.FrameWriter do
     end
   end
 
-  def frame_read_loop(parent, socket) do
+  def frame_read_loop(parent, socket, buf) do
     frames = Cand.Protocol.receive_frame(socket)
-    send(parent, {:frames, frames})
-    frame_read_loop(parent, socket)
+    buf = frames ++ buf
+
+    buf =
+      if length(buf) > @framebuf_size do
+        send(parent, {:frames, buf})
+        []
+      else
+        buf
+      end
+
+    frame_read_loop(parent, socket, buf)
   end
 
   def frame_write_loop(parent, socket) do
@@ -86,7 +95,7 @@ defmodule CanClient.FrameWriter do
       [:ok] = Cand.Protocol.open(socket, "can0")
       Cand.Protocol.raw_mode(socket)
       Logger.info("CAN Connection up at #{inspect(socket)}")
-      spawn_link(fn -> frame_read_loop(parent, socket) end)
+      spawn_link(fn -> frame_read_loop(parent, socket, []) end)
 
       frame_write_loop(parent, socket)
     end)
@@ -157,8 +166,15 @@ defmodule CanClient.FrameWriter do
 
     payload =
       case res do
-        :ok -> %{type: :ok, ref: ref, payload: %{}}
-        {:error, :timeout} -> %{type: :error, ref: ref, payload: %{reason: "CAN send attempted but timed out with no ack"}}
+        :ok ->
+          %{type: :ok, ref: ref, payload: %{}}
+
+        {:error, :timeout} ->
+          %{
+            type: :error,
+            ref: ref,
+            payload: %{reason: "CAN send attempted but timed out with no ack"}
+          }
       end
 
     PhoenixClient.Channel.push_async(
