@@ -19,3 +19,5 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 .elixir_ls/
+/flutter_app/build
+/flutter_app/.dart_tool
