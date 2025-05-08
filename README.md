@@ -1,6 +1,13 @@
 # CanClient
 Uses an MCP2515 to read can messages, does stuff with them
 
+
+## TODO
+* figure out grpc and streaming
+  * figure out how to run it in host mode without the nerves device at all
+* hook up grpc to can read
+* 
+
 ## Notes
 
 ### Tx/rx counters
@@ -30,3 +37,12 @@ Process.sleep(500)
 Cand.Protocol.open(socket, "can0")
 Cand.Protocol.raw_mode(socket)
 Cand.Protocol.receive_frame(socket)
+
+
+# Setup
+* install flutter
+* install protocol buffers
+* install dart protobufs
+```
+dart pub global activate protoc_plugin
+```

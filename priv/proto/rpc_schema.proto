@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package CanClient;
+
+message Empty {}
+
+// The actual RPC service definition with HTTP/2 endpoints defined
+service RPC {
+  rpc Echo (Empty) returns (EchoResult) {
+    option (google.api.http) = {
+        get: "/echo"
+    };
+  }
+
+  rpc StreamEcho (Empty) returns (stream EchoResult) {
+    option (google.api.http) = {
+        get: "/echoStream"
+    };
+  }
+
+}
+
+// Log struct
+message EchoResult {
+    string message = 1;
+}
+

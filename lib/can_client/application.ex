@@ -7,14 +7,13 @@ defmodule CanClient.Application do
 
   @impl true
   def start(_type, _args) do
+    grpc_server =
+      {GRPC.Server.Supervisor, endpoint: CanClient.RPC.Endpoint, port: 50051, start_server: true}
+
     children =
       [
-        # Children for all targets
-        # Starts a worker by calling: CanClient.Worker.start_link(arg)
-        # {CanClient.Worker, arg},
-        {Delux, [indicators: %{default: %{green: "ACT", red: "PWR"}}]},
-        {CanClient.FrameWriter, []}
-      ] ++ target_children()
+        grpc_server
+      ] ++ children(Nerves.Runtime.mix_target())
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -23,23 +22,46 @@ defmodule CanClient.Application do
   end
 
   # List all child processes to be supervised
-  if Mix.target() == :host do
-    defp target_children() do
-      [
-        # Children that only run on the host during development or test.
-        # In general, prefer using `config/host.exs` for differences.
-        #
-        # Starts a worker by calling: Host.Worker.start_link(arg)
-        # {Host.Worker, arg},
-      ]
-    end
-  else
-    defp target_children() do
-      [
-        # Children for all targets except host
-        # Starts a worker by calling: Target.Worker.start_link(arg)
-        # {Target.Worker, arg},
-      ]
+  defp children(:host) do
+    []
+  end
+
+  defp children(_target) do
+    dri_card = get_output_card()
+    launch_env = %{
+      "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}",
+      "GALLIUM_HUD" => "cpu+fps",
+      "GALLIUM_HUD_PERIOD" => "0.25",
+      "GALLIUM_HUD_SCALE" => "3",
+      "GALLIUM_HUD_VISIBLE" => "false",
+      "GALLIUM_HUD_TOGGLE_SIGNAL" => "10"
+    }
+
+    [
+      # Create a child that runs the Flutter embedder.
+      # The `:app_name` matches this application, since it contains the AOT bundle at `priv/flutter_app`.
+      # See the doc annotation for `create_child/1` for all valid options.
+    ]
+
+    [
+      {Delux, [indicators: %{default: %{green: "ACT", red: "PWR"}}]},
+      {CanClient.FrameWriter, []},
+      NervesFlutterSupport.Flutter.Engine.create_child(
+        app_name: :can_client,
+        env: launch_env
+      )
+
+    ]
+  end
+
+  defp get_output_card() do
+    Process.sleep(100)
+    output = Udev.get_cards() |> Enum.find(fn card -> Udev.is_output_card?(card) end)
+
+    if is_nil(output) do
+      get_output_card()
+    else
+      output
     end
   end
 end

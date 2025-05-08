@@ -4,7 +4,7 @@ defmodule CanClient.MixProject do
   @app :can_client
   @version "0.1.0"
   @all_targets [
-    :host,
+    # :host,
     # :rpi5,
     :citron_rpi5
   ]
@@ -51,6 +51,9 @@ defmodule CanClient.MixProject do
       {:phoenix_client, "~> 0.11.1"},
       {:circuits_i2c, "~> 2.1"},
       {:delux, "~> 0.4.1"},
+      {:grpc, "~> 0.9"},
+      {:nerves_flutter_support, "~> 1.0.0"},
+      {:protobuf_generate, "~> 0.1.1"},
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
@@ -86,8 +89,13 @@ defmodule CanClient.MixProject do
       # See https://hexdocs.pm/nerves_pack/readme.html#erlang-distribution
       cookie: "#{@app}_cookie",
       include_erts: &Nerves.Release.erts/0,
-      steps: [&Nerves.Release.init/1, :assemble],
-      strip_beams: Mix.env() == :prod or [keep: ["Docs"]]
+      steps: [&Nerves.Release.init/1, &NervesFlutterSupport.InstallRuntime.run/1, &NervesFlutterSupport.BuildFlutterApp.run/1, :assemble],
+      strip_beams: Mix.env() == :prod or [keep: ["Docs"]],
+      flutter: [
+        project_dir: "flutter_app/can_ui",
+        # output_dir: "/app/build/aot_output/path/",
+      ],
+
     ]
   end
 end
