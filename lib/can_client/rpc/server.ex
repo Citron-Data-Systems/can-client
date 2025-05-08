@@ -9,7 +9,7 @@ defmodule CanClient.RPC.Server do
   """
   def echo(_request, _stream) do
     %CanClient.EchoResult{
-      message: "hello world from elixir"
+      message: "bugs"
     }
   end
 

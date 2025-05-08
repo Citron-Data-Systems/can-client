@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:isolate';
 
 import 'package:can_ui/api.dart';
 import 'package:flutter/material.dart';
 import 'package:can_ui/gauge.dart';
+import 'package:can_ui/helloworld.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,16 +58,12 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-void aFunction(SendPort port) async {
-  API.updateBaseURI();
-  var whatever = await API.echo();
-
-  port.send(whatever.message);
-}
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String _message = "unknown";
+
+  
 
   void _incrementCounter() {
     setState(() {
@@ -83,20 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final receivePort = ReceivePort();
-    // Spawn a new isolate and pass the SendPort from our ReceivePort
-    Isolate.spawn(aFunction, receivePort.sendPort);
-    receivePort.listen((message) {
-      setState(() {
-        _message = message;
-      });
-    });
-
     var widgets = [
-      Text(
-        '$_message',
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
+      HelloworldWidget(),
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

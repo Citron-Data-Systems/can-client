@@ -4,7 +4,7 @@ import Config
 
 config :logger,
   level: :debug,
-  truncate: :infinity
+  truncate: 1024 * 10
 
 config :nerves_runtime,
   kv_backend:
