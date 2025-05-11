@@ -16,7 +16,7 @@ service RPC {
 
   rpc StreamEcho (Empty) returns (stream EchoResult) {
     option (google.api.http) = {
-        get: "/echoStream"
+        get: "/streamEcho"
     };
   }
 

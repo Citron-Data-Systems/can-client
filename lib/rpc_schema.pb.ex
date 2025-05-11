@@ -37,7 +37,7 @@ defmodule CanClient.RPC.Service do
         body: "",
         additional_bindings: [],
         response_body: "",
-        pattern: {:get, "/echoStream"},
+        pattern: {:get, "/streamEcho"},
         __unknown_fields__: []
       }
     }

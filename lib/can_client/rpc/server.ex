@@ -1,8 +1,9 @@
-
 defmodule CanClient.RPC.Server do
   use GRPC.Server,
     service: CanClient.RPC.Service,
     http_transcode: true
+
+  alias GRPC.Server
 
   @doc """
   gRPC function used to fetch basic system information
@@ -13,14 +14,17 @@ defmodule CanClient.RPC.Server do
     }
   end
 
-  # def stream_logs(_request, stream) do
-  #   GenServer.start_link(CanClient.LogServer, stream: stream)
+  defp sendit(stream, i) do
+    Server.send_reply(stream, %CanClient.EchoResult{
+      message: "hello #{i}"
+    })
+    |> IO.inspect()
 
-  #   Task.async(fn ->
-  #     Process.sleep(:infinity)
-  #     :ok
-  #   end)
-  #   |> Task.await(:infinity)
-  # end
+    Process.sleep(500)
+    sendit(stream, i + 1)
+  end
 
+  def stream_echo(_request, stream) do
+    sendit(stream, 0)
+  end
 end

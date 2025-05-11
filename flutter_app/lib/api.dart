@@ -31,4 +31,8 @@ class API {
   static Future<EchoResult> echo() async {
     return await _client!.echo(Empty());
   }
+  static ResponseStream<EchoResult> streamEcho() {
+    return _client!.streamEcho(Empty());
+  }
+
 }

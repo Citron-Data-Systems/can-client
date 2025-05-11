@@ -1,10 +1,7 @@
-import 'dart:io';
-import 'dart:isolate';
-
-import 'package:can_ui/api.dart';
 import 'package:flutter/material.dart';
 import 'package:can_ui/gauge.dart';
-import 'package:can_ui/helloworld.dart';
+import 'package:can_ui/hello_api_widget.dart';
+import 'package:can_ui/hello_stream_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -83,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     var widgets = [
       HelloworldWidget(),
+      HelloStreamWidget(),
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

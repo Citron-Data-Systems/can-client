@@ -3,19 +3,30 @@ Uses an MCP2515 to read can messages, does stuff with them
 
 
 ## TODO
-* figure out grpc and streaming
-  * figure out how to run it in host mode without the nerves device at all
-* hook up grpc to can read
-* 
+* create citronAPI genserver which holds the websocket
+  * connect to websocket async
+  * have disconnected state - don't crash on disconnect
+* frame_writer creates a CAN channel 
+* display_api has a vehicle channel
+  * vehicle channel gets the dashboard
+  
+
 
 ## Notes
+
+
 
 ### Tx/rx counters
 {res, _} = System.cmd("ip", ["-details", "link", "show", "can0"]); IO.puts(res)
 ### dump
 cmd("candump can0")
 
-
+### API
+#### To add/update an API call
+* edit priv/proto/rpc_schema.proto
+* run ./proto-gen.sh
+* edit server.ex to do stuff
+* rpc_schema.pb.ex is a generated file
 
 ### This should work
 port = 29536
