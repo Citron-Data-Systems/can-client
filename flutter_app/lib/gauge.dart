@@ -1,8 +1,11 @@
 import 'dart:math' as math;
+import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:can_ui/api.dart';
 
-class Gauge extends StatelessWidget {
-  final int value;
+class Gauge extends HookWidget {
+  final String signalName;
   final String label;
   final double maxValue;
   final double minValue;
@@ -17,12 +20,12 @@ class Gauge extends StatelessWidget {
 
   const Gauge({
     Key? key,
-    required this.value,
     required this.label,
     required this.maxValue,
     required this.minValue,
+    required this.signalName,
+    required this.size,
 
-    this.size = 300,
     this.arcColor = Colors.blue,
     this.backgroundColor = Colors.black87,
     this.needleColor = Colors.red,
@@ -34,6 +37,31 @@ class Gauge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var state = useState(0.0);
+
+    useEffect(() {
+      API.updateBaseURI();
+      final stream = API.streamSignals(signalName);
+
+      stream.listen(
+        (data) {
+          state.value = data.value;
+        },
+        onError: (error) => {
+
+        },
+        onDone: () => {
+
+        },
+      );
+
+      return () {
+        stream.cancel();
+      };
+    }, const []);
+
+
+
     return Container(
       width: size,
       height: size,
@@ -60,7 +88,7 @@ class Gauge extends StatelessWidget {
             size: Size(size, size),
             painter: GaugePainter(
               label: label,
-              value: value,
+              value: state.value,
               maxValue: maxValue,
               minValue: minValue,
               arcColor: arcColor,
@@ -74,12 +102,11 @@ class Gauge extends StatelessWidget {
           CustomPaint(
             size: Size(size, size),
             painter: NeedlePainter(
-              value: value,
+              value: state.value,
               maxValue: maxValue,
               needleColor: needleColor,
               startAngleDegrees: startAngleDegrees,
               sweepAngleDegrees: sweepAngleDegrees,
-
             ),
           ),
           // Central cap
@@ -118,7 +145,7 @@ class Gauge extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  '${value.toInt()}',
+                  state.value.toStringAsFixed(2),
                   style: TextStyle(
                     color: textColor,
                     fontSize: size * 0.08,
@@ -141,20 +168,29 @@ class Gauge extends StatelessWidget {
   }
 }
 
-class GaugeZone {
-  final int start;
-  final int end;
-  final Color color;
+Color hexToColor(String hexString) {
+  // Remove the hash symbol if present
+  final String hex = hexString.replaceAll('#', '');
 
-  const GaugeZone({
-    required this.start,
-    required this.end,
-    required this.color,
-  });
+  // Parse the hex string to an integer
+  int colorValue;
+
+  // Handle different hex formats (6 digits, 8 digits)
+  if (hex.length == 6) {
+    // Without alpha (RGB)
+    colorValue = int.parse('0xFF' + hex, radix: 16);
+  } else if (hex.length == 8) {
+    // With alpha (ARGB)
+    colorValue = int.parse('0x' + hex, radix: 16);
+  } else {
+    throw FormatException('Invalid hex color format: $hexString');
+  }
+
+  return Color(colorValue);
 }
 
 class GaugePainter extends CustomPainter {
-  final int value;
+  final double value;
   final double maxValue;
   final double minValue;
   final String label;
@@ -211,7 +247,7 @@ class GaugePainter extends CustomPainter {
 
       final zonePaint =
           Paint()
-            ..color = zone.color
+            ..color = hexToColor(zone.color)
             ..style = PaintingStyle.stroke
             ..strokeWidth = arcWidth
             ..strokeCap = StrokeCap.round;
@@ -322,7 +358,7 @@ class GaugePainter extends CustomPainter {
 }
 
 class NeedlePainter extends CustomPainter {
-  final int value;
+  final double value;
   final double maxValue;
   final Color needleColor;
   final int startAngleDegrees;
@@ -333,7 +369,7 @@ class NeedlePainter extends CustomPainter {
     required this.maxValue,
     required this.needleColor,
     required this.startAngleDegrees,
-    required this.sweepAngleDegrees
+    required this.sweepAngleDegrees,
   });
 
   @override

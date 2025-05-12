@@ -7,7 +7,7 @@ class API {
   static String _baseHostname = "127.0.0.1";
   static ClientChannel? _channel;
   static RPCClient? _client;
-  static final Empty _empty = Empty.create();
+  // static final Empty _empty = Empty.create();
 
   static updateBaseURI() {
     final env = Platform.environment;
@@ -23,16 +23,26 @@ class API {
     );
 
     _client = RPCClient(
-      _channel!,
-      options: CallOptions(timeout: const Duration(seconds: 30)),
+      _channel!
     );
   }
 
   static Future<EchoResult> echo() async {
     return await _client!.echo(Empty());
   }
+
+  static ResponseStream<SignalValue> streamSignals(String signal) {
+    return _client!.streamSignal(
+      SignalSubscription(signal: signal),
+    );
+  }
+
   static ResponseStream<EchoResult> streamEcho() {
     return _client!.streamEcho(Empty());
+  }
+
+  static Future<Vehicle> vehicleMeta() {
+    return _client!.vehicleMeta(Empty());
   }
 
 }

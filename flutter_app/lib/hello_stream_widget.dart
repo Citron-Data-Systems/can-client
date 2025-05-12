@@ -11,12 +11,18 @@ class HelloStreamWidget extends HookWidget {
 
     useEffect(() {
       API.updateBaseURI();
-      final stream = API.streamEcho();
+      final stream = API.streamSignals("VehicleSpeed");
 
       stream.listen(
-        (data) => state.value = data.message,
-        onError: (error) => print("oof"),
-        onDone: () => print('done'),
+        (data) {
+          state.value = data.value.toString();
+        },
+        onError: (error) => {
+          state.value = "error ${error.toString()}"
+        },
+        onDone: () => {
+          state.value = "done"
+        },
       );
 
       return () {

@@ -45,22 +45,21 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
     defp load_def(v_def) do
       true = :ets.insert(__MODULE__, {@vehicle_definition, v_def})
 
-      lookup_table =
-        Enum.flat_map(v_def["dbc_defs"], fn %{"content" => content} ->
-          case Canbus.Dbc.parse(content) do
-            {:ok, parsed} ->
-              [parsed]
+      Enum.flat_map(v_def["dbc_defs"], fn %{"content" => content} ->
+        case Canbus.Dbc.parse(content) do
+          {:ok, parsed} ->
+            [parsed]
 
-            error ->
-              Logger.warning("Failed to load dbc #{inspect(error)}")
-              []
-          end
+          error ->
+            Logger.warning("Failed to load dbc #{inspect(error)}")
+            []
+        end
+      end)
+      |> Enum.each(fn parsed ->
+        Enum.each(Map.keys(parsed.message), fn can_id ->
+          :ets.insert(__MODULE__, {{@dbc_definition, can_id}, parsed})
         end)
-        |> Enum.each(fn parsed ->
-          Enum.each(Map.keys(parsed.message), fn can_id ->
-            :ets.insert(__MODULE__, {{@dbc_definition, can_id}, parsed})
-          end)
-        end)
+      end)
     end
 
     defp save_def(dets_tab, v_def) do
@@ -91,6 +90,13 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
       end
 
       {:noreply, state}
+    end
+
+    def get_vehicle() do
+      case :ets.lookup(__MODULE__, @vehicle_definition) do
+        [{@vehicle_definition, v_def}] -> {:ok, v_def}
+        _ -> {:error, :not_found}
+      end
     end
 
     def get_dbc(can_id) do
@@ -124,26 +130,59 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
   defmodule StateHolder do
     use GenServer
 
-    def start_link() do
+    def start_link(_) do
       GenServer.start_link(__MODULE__, [], name: __MODULE__)
     end
 
     def init(_) do
-      {:ok, %{}}
+      {:ok, {%{}, %{}}}
     end
 
-    def handle_cast({:pub, kvs}, state) do
-      IO.inspect {:pub, kvs}
-      state = Enum.reduce(kvs, state, fn {k, v}, state -> Map.put(state, k, v) end)
-      {:noreply, state}
+    def handle_cast({:pub, kvs}, {ws, subscriptions}) do
+      ws = Enum.reduce(kvs, ws, fn {k, v}, state -> Map.put(state, k, v) end)
+
+      Enum.each(kvs, fn {k, v} ->
+        Map.get(subscriptions, k, [])
+        |> Enum.each(fn pid ->
+          send(pid, {__MODULE__, k, v})
+        end)
+      end)
+
+      {:noreply, {ws, subscriptions}}
     end
 
-    def handle_call(:get, state) do
-      {:reply, {:ok, state}, state}
+    def handle_cast({:sub, signals, who}, {ws, subscriptions}) do
+      _ref = Process.monitor(who)
+
+      subscriptions =
+        Enum.reduce(signals, subscriptions, fn signal, acc ->
+          existing = Map.get(acc, signal, [])
+          Map.put(acc, signal, Enum.uniq([who | existing]))
+        end)
+
+      {:noreply, {ws, subscriptions}}
+    end
+
+    def handle_call(:get, {ws, _} = state) do
+      {:reply, {:ok, ws}, state}
+    end
+
+    def handle_info({:DOWN, _ref, :process, pid, _reason}, {ws, subscriptions}) do
+      subscriptions =
+        Enum.map(subscriptions, fn {signal, subs} ->
+          {signal, List.delete(subs, pid)}
+        end)
+        |> Enum.into(%{})
+
+      {:noreply, {ws, subscriptions}}
     end
 
     def get() do
       GenServer.call(__MODULE__, :get)
+    end
+
+    def sub(signals) do
+      GenServer.cast(__MODULE__, {:sub, signals, self()})
     end
 
     def pub(kvs) do
@@ -155,18 +194,19 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
     {:ok, _pid} =
       DynamicSupervisor.start_child(CanClient.DynamicSupervisor, {DefinitionManager, []})
 
-    {:ok, _holder} = StateHolder.start_link()
+    {:ok, _holder} =
+      DynamicSupervisor.start_child(CanClient.DynamicSupervisor, {StateHolder, []})
+
     {:ok, %{}}
   end
 
   def handle_frames(frames, _state) do
-    # IO.inspect {:handle_frames, frames}
     Enum.flat_map(frames, fn [id, _ts, bytes] ->
       case DefinitionManager.decode(id, bytes) do
         {:ok, kv_pairs} ->
           kv_pairs
 
-        _ ->
+        e ->
           []
       end
     end)

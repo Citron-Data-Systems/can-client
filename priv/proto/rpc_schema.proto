@@ -6,6 +6,104 @@ package CanClient;
 
 message Empty {}
 
+message EchoResult {
+    string message = 1;
+}
+message SignalValue {
+    float value = 2;
+}
+message SignalSubscription {
+  string signal = 1;
+}
+
+// LayoutInfo represents positioning information in a grid
+message LayoutInfo {
+  // X position in grid units
+  int32 x = 1;
+  // Y position in grid units
+  int32 y = 2;
+  // Width in grid units
+  int32 w = 3;
+  // Height in grid units
+  int32 h = 4;
+}
+
+// Signal represents a data signal
+message Signal {
+  string name = 1;
+  string unit = 2;
+  double range_min = 3;
+  double range_max = 4;
+  string id = 5;
+}
+
+// DBCMessage represents a CAN message
+message DBCMessage {
+  int64 can_id = 2;
+  repeated Signal signals = 3;
+}
+
+
+// DBCDef represents a DBC definition
+message DBCDef {
+  string content = 2;
+  string filename = 3;
+  repeated DBCMessage messages = 4;
+}
+
+// LineChartWidget specific fields
+message LineChartWidget {
+  optional string title = 1;
+  repeated string columns = 2;
+  LayoutInfo layout = 3;
+}
+
+
+message GaugeZone {
+  double start = 1;
+  double end = 2;
+  string color = 3;
+}
+
+message GaugeStyle {
+  repeated GaugeZone zones = 4;
+  string style_type = 5;
+
+}
+
+message GaugeWidget {
+  optional string title = 1;
+  repeated string columns = 2;
+  LayoutInfo layout = 3;
+  GaugeStyle style = 4;
+}
+
+
+// Unified widget message with oneof field
+message DashWidget {
+  oneof widget {
+    LineChartWidget line_chart = 1;
+    GaugeWidget gauge = 2;
+  }
+}
+
+// // Dashboard contains multiple widgets
+message Dashboard {
+  string uid = 1;
+  string name = 2;
+  repeated DashWidget widgets = 3;
+}
+
+
+// // Vehicle is the top-level entity
+message Vehicle {
+  string name = 2;
+  string avatar = 3;
+  repeated DBCDef dbc_defs = 4;
+  repeated Dashboard dashboards = 5;
+  string uid = 6;
+}
+
 // The actual RPC service definition with HTTP/2 endpoints defined
 service RPC {
   rpc Echo (Empty) returns (EchoResult) {
@@ -20,10 +118,17 @@ service RPC {
     };
   }
 
-}
+  rpc StreamSignal (SignalSubscription) returns (stream SignalValue) {
+    option (google.api.http) = {
+        get: "/streamSignals"
+    };
+  }
 
-// Log struct
-message EchoResult {
-    string message = 1;
+  rpc VehicleMeta (Empty) returns (Vehicle) {
+    option (google.api.http) = {
+        get: "/vehicleMeta"
+    };
+  }
+
 }
 

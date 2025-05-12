@@ -75,7 +75,7 @@ defmodule CanClient.MockFrameHandler do
 
 
   BO_ 513 BASE1: 8 Vector__XXX
-  SG_ RPM : 0|16@1+ (1,0) [0|0] "RPM" Vector__XXX
+  SG_ RPM : 0|16@1+ (1,0) [0|9000] "RPM" Vector__XXX
   SG_ IgnitionTiming : 16|16@1- (0.02,0) [0|0] "deg" Vector__XXX
   SG_ InjDuty : 32|8@1+ (0.5,0) [0|100] "%" Vector__XXX
   SG_ IgnDuty : 40|8@1+ (0.5,0) [0|100] "%" Vector__XXX
@@ -98,7 +98,7 @@ defmodule CanClient.MockFrameHandler do
   SG_ FuelLevel : 56|8@1+ (0.5,0) [0|0] "%" Vector__XXX
 
   BO_ 516 BASE4: 8 Vector__XXX
-  SG_ OilPress : 16|16@1+ (0.03333333,0) [0|0] "kPa" Vector__XXX
+  SG_ OilPress : 16|16@1+ (0.03333333,0) [0|500] "kPa" Vector__XXX
   SG_ OilTemperature : 32|8@1+ (1,-40) [-40|215] "deg C" Vector__XXX
   SG_ FuelTemperature : 40|8@1+ (1,-40) [-40|215] "deg C" Vector__XXX
   SG_ BattVolt : 48|16@1+ (0.001,0) [0|25] "mV" Vector__XXX
@@ -211,7 +211,7 @@ defmodule CanClient.MockFrameHandler do
 
   def init(_) do
     {:ok, dbc} = Canbus.Dbc.parse(@dbc)
-    :timer.send_interval(500, :frames)
+    :timer.send_interval(33, :frames)
 
     state =
       Enum.map(@receivers, fn mod ->
@@ -220,17 +220,29 @@ defmodule CanClient.MockFrameHandler do
       end)
       |> Enum.into(%{})
 
-    {:ok, {state, dbc}}
+    {:ok, {state, dbc, System.monotonic_time(:millisecond)}}
   end
 
-  defp gen_random(dbc) do
+  defp gen_random(dbc, start_time) do
+    period_seconds = 5
     Enum.flat_map(dbc.message, fn {can_id, message} ->
       values =
         Enum.map(message.signals, fn sig ->
           {min, max} = sig.range
           min = min || 0
           max = max || 100
-          value = trunc(:rand.uniform() * (max - 1) + min)
+
+          amplitude = (max - min) / 2
+
+          # Calculate the vertical offset (middle point between min and max)
+          offset = min + amplitude
+
+          # Calculate the angular frequency (how quickly the sine wave completes a cycle)
+          angular_frequency = 2 * :math.pi() / period_seconds
+          current_time = System.monotonic_time(:millisecond)
+          elapsed_seconds = (current_time - start_time) / 1000
+          value = trunc(offset + amplitude * :math.sin(angular_frequency * elapsed_seconds))
+
           {sig.name, value}
         end)
         |> Enum.into(%{})
@@ -249,14 +261,15 @@ defmodule CanClient.MockFrameHandler do
     end)
   end
 
-  def handle_info(:frames, {state, dbc}) do
-    fake = gen_random(dbc)
+  def handle_info(:frames, {state, dbc, t}) do
+    fake = gen_random(dbc, t)
+
     new_state =
       Enum.reduce(state, state, fn {mod, r_state}, acc ->
         new_r_state = mod.handle_frames(fake, r_state)
         Map.put(acc, mod, new_r_state)
       end)
 
-    {:noreply, {new_state, dbc}}
+    {:noreply, {new_state, dbc, t}}
   end
 end

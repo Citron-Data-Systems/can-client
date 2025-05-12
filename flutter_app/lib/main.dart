@@ -1,9 +1,33 @@
+import 'package:can_ui/api.dart';
+import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:can_ui/gauge.dart';
-import 'package:can_ui/hello_api_widget.dart';
-import 'package:can_ui/hello_stream_widget.dart';
 
-void main() {
+import 'package:window_manager/window_manager.dart';
+
+const screenSize = Size(840, 430);
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  WindowOptions windowOptions = const WindowOptions(
+    size: screenSize,
+    center: true,
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.normal,
+    windowButtonVisibility: true,
+
+    // IRL we probably want:
+    // skipTaskbar: true,
+    // titleBarStyle: TitleBarStyle.hidden,
+    // windowButtonVisibility: false, // TODO
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
   runApp(const MyApp());
 }
 
@@ -14,7 +38,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -33,122 +56,157 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.dark(),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MyHomePage({super.key});
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _Home();
 }
 
+class _Home extends State<MyHomePage> {
+  Vehicle? _vehicle;
+  List<Widget> _widgets = [];
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  @override
+  void initState() {
+    super.initState();
+    _getVehicle();
+  }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter = _counter + 10;
-      if (_counter > 120) {
-        _counter = 0;
+  _getVehicle() async {
+    API.updateBaseURI();
+    final vehicle = await API.vehicleMeta();
+
+    List<Widget> working = [];
+    for (var w in vehicle.dashboards.first.widgets) {
+      if (w.hasGauge()) {
+        working.add(_createGaugeWidget(vehicle, w.gauge));
+      } else if (w.hasLineChart()) {
+        working.add(_createLineWidget(vehicle, w.lineChart));
       }
+    }
+    setState(() {
+      _vehicle = vehicle;
+      _widgets = working;
     });
+  }
+
+  Widget _createGaugeWidget(Vehicle vehicle, GaugeWidget defn) {
+    final signalName = defn.columns.first;
+
+    final unitW = (screenSize.width / 12.0);
+    final size = defn.layout.w * unitW;
+    // final size = 300.0;
+
+    double? minValue;
+    double? maxValue;
+    for (var dbc in vehicle.dbcDefs) {
+      for (var message in dbc.messages) {
+        for (var sig in message.signals) {
+          if (sig.name == signalName) {
+            minValue = sig.rangeMin;
+            maxValue = sig.rangeMax;
+          }
+        }
+      }
+    }
+
+    return Gauge(
+      label: defn.title,
+      signalName: signalName,
+      maxValue: maxValue!,
+      minValue: minValue!,
+      size: size,
+      arcColor: Theme.of(context).splashColor,
+      backgroundColor: Theme.of(context).canvasColor,
+      needleColor: Theme.of(context).primaryColorLight,
+      textColor:
+          Theme.of(context).textTheme.bodySmall?.color ??
+          Theme.of(context).splashColor,
+      zones: defn.style.zones,
+    );
+  }
+
+  Widget _createLineWidget(Vehicle vehicle, LineChartWidget defn) {
+    throw UnimplementedError('nope');
   }
 
   @override
   Widget build(BuildContext context) {
-    var widgets = [
-      HelloworldWidget(),
-      HelloStreamWidget(),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Gauge(
-            label: "RPM",
-            value: _counter,
-            maxValue: 8000,
-            minValue: 0,
-            size: 300,
-            arcColor: Theme.of(context).splashColor,
-            backgroundColor: Theme.of(context).canvasColor,
-            needleColor: Theme.of(context).primaryColorLight,
-            textColor:
-                Theme.of(context).textTheme.bodySmall?.color ??
-                Theme.of(context).splashColor,
-            zones: [
-              GaugeZone(start: 6000, end: 7000, color: Colors.orange),
-              GaugeZone(start: 7000, end: 9000, color: Colors.red),
-            ],
-          ),
-        ],
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Gauge(
-            label: "CoolantTmp",
-            value: _counter,
-            maxValue: 130,
-            minValue: 0,
-            size: 300,
-            arcColor: Theme.of(context).splashColor,
-            backgroundColor: Theme.of(context).canvasColor,
-            needleColor: Theme.of(context).primaryColorLight,
-            textColor:
-                Theme.of(context).textTheme.bodySmall?.color ??
-                Theme.of(context).splashColor,
-            zones: [
-              GaugeZone(start: 85, end: 105, color: Colors.green),
+    // var widgets = [
+    //   Column(
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     children: [
+    //       Gauge(
+    //         label: "RPM",
+    //         signalName: "RPM",
+    //         maxValue: 8000,
+    //         minValue: 0,
+    //         size: 300,
+    //         arcColor: Theme.of(context).splashColor,
+    //         backgroundColor: Theme.of(context).canvasColor,
+    //         needleColor: Theme.of(context).primaryColorLight,
+    //         textColor:
+    //             Theme.of(context).textTheme.bodySmall?.color ??
+    //             Theme.of(context).splashColor,
+    //         zones: [
+    //           GaugeZone(start: 6000, end: 7000, color: 'ff0000'),
+    //           // GaugeZone(start: 7000, end: 9000, color: Colors.red),
+    //         ],
+    //       ),
+    //     ],
+    //   ),
+    //   Column(
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     children: [
+    //       Gauge(
+    //         label: "CoolantTemp",
+    //         signalName: "CoolantTemp",
+    //         maxValue: 130,
+    //         minValue: 0,
+    //         size: 300,
+    //         arcColor: Theme.of(context).splashColor,
+    //         backgroundColor: Theme.of(context).canvasColor,
+    //         needleColor: Theme.of(context).primaryColorLight,
+    //         textColor:
+    //             Theme.of(context).textTheme.bodySmall?.color ??
+    //             Theme.of(context).splashColor,
+    //         zones: [
+    //           GaugeZone(start: 85, end: 105, color: '00ff00'),
 
-              GaugeZone(start: 105, end: 110, color: Colors.orange),
-              // GaugeZone(start: 10, end: 100, color: Colors.green),
-              GaugeZone(start: 110, end: 130, color: Colors.red),
-            ],
-          ),
-        ],
-      ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Gauge(
-            label: "OilPress",
-            value: _counter,
-            maxValue: 120,
-            minValue: 0,
-            size: 300,
-            arcColor: Theme.of(context).splashColor,
-            backgroundColor: Theme.of(context).canvasColor,
-            needleColor: Theme.of(context).primaryColorLight,
-            textColor:
-                Theme.of(context).textTheme.bodySmall?.color ??
-                Theme.of(context).splashColor,
-            zones: [
-              GaugeZone(start: 0, end: 10, color: Colors.red),
-              // GaugeZone(start: 10, end: 100, color: Colors.green),
-              GaugeZone(start: 100, end: 120, color: Colors.orange),
-            ],
-          ),
-        ],
-      ),
-    ];
+    //           GaugeZone(start: 110, end: 130, color: 'ff0000'),
+    //         ],
+    //       ),
+    //     ],
+    //   ),
+    //   Column(
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     children: [
+    //       Gauge(
+    //         label: "OilPress",
+    //         signalName: "OilPress",
+    //         maxValue: 120,
+    //         minValue: 0,
+    //         size: 300,
+    //         arcColor: Theme.of(context).splashColor,
+    //         backgroundColor: Theme.of(context).canvasColor,
+    //         needleColor: Theme.of(context).primaryColorLight,
+    //         textColor:
+    //             Theme.of(context).textTheme.bodySmall?.color ??
+    //             Theme.of(context).splashColor,
+    //         zones: [
+    //           GaugeZone(start: 0, end: 10, color: Colors.red),
+    //           // GaugeZone(start: 10, end: 100, color: Colors.green),
+    //           GaugeZone(start: 100, end: 120, color: Colors.orange),
+    //         ],
+    //       ),
+    //     ],
+    //   ),
+    // ];
 
     return Scaffold(
       body: Center(
@@ -157,17 +215,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: GridView.count(
           crossAxisCount: 3, // Number of columns in the grid
           mainAxisSpacing: 0.0, // Spacing between rows
-          crossAxisSpacing: 10.0, // Spacing between columns
-          padding: EdgeInsets.all(20.0), // Padding around the grid
+          crossAxisSpacing: 5.0, // Spacing between columns
+          padding: EdgeInsets.all(5.0), // Padding around the grid
           shrinkWrap: true, // Use the minimum space needed
-          children: widgets, // Your list of widgets
+          children: _widgets,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
