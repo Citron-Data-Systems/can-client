@@ -2,9 +2,27 @@ import Config
 
 # Add configuration that is only needed when running on the host here.
 
-config :logger,
+config :logger, :console,
+  handle_sasl_reports: true,
+  handle_otp_reports: true,
+  truncate: :infinity,
   level: :debug,
-  truncate: 1024 * 10
+  truncate: 1024 * 10,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [
+    :request_id,
+    :module,
+    :function,
+    :pid,
+    :vehicle_id,
+    :session_id,
+    :signal_name
+  ]
+
+
+config :can_client,
+  ws_url: "ws://localhost:4000/socket/websocket",
+  vehicle_uid: "veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006"
 
 config :nerves_runtime,
   kv_backend:

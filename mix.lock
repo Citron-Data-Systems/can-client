@@ -1,5 +1,6 @@
 %{
   "beam_notify": {:hex, :beam_notify, "1.1.1", "da7dd04f16120bcab71f01ff81607ea38ad78af859cd87fad2012eac8feab034", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "5a09fc8449171da423f781de16b95cdec52763e60308345de6f15358c2382a42"},
+  "canbus": {:git, "https://github.com/rozap/canbus.git", "14dc9278d3a1ae5fade47e9dbb84960b35e67346", []},
   "cand": {:git, "https://github.com/Citron-Data-Systems/cand.git", "f0c3a1ddfba044fb58a1fdbeb2fc3c98f000dfcb", []},
   "castore": {:hex, :castore, "1.0.12", "053f0e32700cbec356280c0e835df425a3be4bc1e0627b714330ad9d0f05497f", [:mix], [], "hexpm", "3dca286b2186055ba0c9449b4e95b97bf1b57b47c1f2644555879e659960c224"},
   "circuits_i2c": {:hex, :circuits_i2c, "2.1.0", "0656ea5d106744c498a8cd778f39c0685ab574e3da7159814cfbfe709001f0e5", [:make, :mix], [{:elixir_make, "~> 0.6", [hex: :elixir_make, repo: "hexpm", optional: false]}], "hexpm", "3751a875a9d728080fdbc5fd352f728d4746a82e17e52f4444c406200349f6ac"},

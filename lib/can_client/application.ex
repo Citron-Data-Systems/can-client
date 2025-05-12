@@ -5,6 +5,24 @@ defmodule CanClient.Application do
 
   use Application
 
+  defmodule CitronSupervisor do
+    use Supervisor
+
+    def start_link([]) do
+      Supervisor.start_link(__MODULE__, [], name: __MODULE__)
+    end
+
+    @impl true
+    def init([]) do
+      children = [
+        {CanClient.CitronAPI, []}
+      ]
+
+      # effectively infinite restarts
+      Supervisor.init(children, strategy: :one_for_one, max_restarts: 100_000, max_seconds: 1)
+    end
+  end
+
   @impl true
   def start(_type, _args) do
     grpc_server =
@@ -12,7 +30,13 @@ defmodule CanClient.Application do
 
     children =
       [
-        grpc_server
+        grpc_server,
+        CitronSupervisor,
+        {DynamicSupervisor,
+         name: CanClient.DynamicSupervisor,
+         strategy: :one_for_one,
+         max_restarts: 1000,
+         max_seconds: 1}
       ] ++ children(Nerves.Runtime.mix_target())
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -23,11 +47,14 @@ defmodule CanClient.Application do
 
   # List all child processes to be supervised
   defp children(:host) do
-    []
+    [
+      {CanClient.MockFrameHandler, []}
+    ]
   end
 
   defp children(_target) do
     dri_card = get_output_card()
+
     launch_env = %{
       "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}",
       "GALLIUM_HUD" => "cpu+fps",
@@ -44,13 +71,13 @@ defmodule CanClient.Application do
     ]
 
     [
+      {CanClient.CanNet},
       {Delux, [indicators: %{default: %{green: "ACT", red: "PWR"}}]},
-      {CanClient.FrameWriter, []},
+      {CanClient.FrameHandler, []},
       NervesFlutterSupport.Flutter.Engine.create_child(
         app_name: :can_client,
         env: launch_env
       )
-
     ]
   end
 
@@ -63,5 +90,9 @@ defmodule CanClient.Application do
     else
       output
     end
+  end
+
+  def get_vehicle_id() do
+    Application.get_env(:can_client, :vehicle_uid)
   end
 end

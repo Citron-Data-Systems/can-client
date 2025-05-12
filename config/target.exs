@@ -19,6 +19,12 @@ config :logger, RingLogger,
 
 config :logger, backends: [RingLogger]
 
+
+config :can_client,
+  ws_url: "wss://citron.systems/socket/websocket",
+  vehicle_uid: "veh_b5229603-aa80-4f73-ba64-048a830a1a39"
+
+
 # Use shoehorn to start the main application. See the shoehorn
 # library documentation for more control in ordering how OTP
 # applications are started and handling failures.

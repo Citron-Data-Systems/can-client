@@ -54,6 +54,7 @@ defmodule CanClient.MixProject do
       {:grpc, "~> 0.9"},
       {:nerves_flutter_support, "~> 1.0.0"},
       {:protobuf_generate, "~> 0.1.1"},
+      {:canbus, github: "rozap/canbus"},
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang

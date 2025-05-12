@@ -6,10 +6,10 @@ Uses an MCP2515 to read can messages, does stuff with them
 * create citronAPI genserver which holds the websocket
   * connect to websocket async
   * have disconnected state - don't crash on disconnect
-* frame_writer creates a CAN channel 
+* frame_writer creates a CAN channel
 * display_api has a vehicle channel
   * vehicle channel gets the dashboard
-  
+
 
 
 ## Notes
@@ -52,8 +52,9 @@ Cand.Protocol.receive_frame(socket)
 
 # Setup
 * install flutter
+`sudo apt-get install -y protobuf-compiler unzip xz-utils zip libglu1-mesa clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev`
 * install protocol buffers
 * install dart protobufs
 ```
-dart pub global activate protoc_plugin
+dart pub global activate protoc_plugin 21.1.2
 ```

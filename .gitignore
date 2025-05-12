@@ -20,4 +20,8 @@ erl_crash.dump
 /tmp/
 .elixir_ls/
 /flutter_app/build
+flutter_app/build
 /flutter_app/.dart_tool
+/vehicle_def.dets
+vehicle_def.dets
+vehicle_dfn.dets
