@@ -26,3 +26,5 @@ flutter_app/build
 vehicle_def.dets
 vehicle_dfn.dets
 /priv/flutter_app/data
+flutter_app/.dart_tool/
+flutter_app/.flutter-plugins-dependencies
