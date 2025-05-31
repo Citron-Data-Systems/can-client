@@ -22,7 +22,8 @@ config :logger, :console,
 
 config :can_client,
   ws_url: "ws://localhost:4000/socket/websocket",
-  vehicle_uid: "veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006"
+  vehicle_uid: "veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006",
+  vehicle_meta_location: "/tmp/vehicle_meta.dets"
 
 config :nerves_runtime,
   kv_backend:

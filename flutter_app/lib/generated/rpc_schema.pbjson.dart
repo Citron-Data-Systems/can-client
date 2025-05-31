@@ -243,3 +243,57 @@ final $typed_data.Uint8List vehicleDescriptor = $convert.base64Decode(
     'ZHMYBSADKAsyFC5DYW5DbGllbnQuRGFzaGJvYXJkUgpkYXNoYm9hcmRzEhAKA3VpZBgGIAEoCV'
     'IDdWlk');
 
+@$core.Deprecated('Use notFoundDescriptor instead')
+const NotFound$json = {
+  '1': 'NotFound',
+};
+
+/// Descriptor for `NotFound`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List notFoundDescriptor = $convert.base64Decode(
+    'CghOb3RGb3VuZA==');
+
+@$core.Deprecated('Use offlineDescriptor instead')
+const Offline$json = {
+  '1': 'Offline',
+};
+
+/// Descriptor for `Offline`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List offlineDescriptor = $convert.base64Decode(
+    'CgdPZmZsaW5l');
+
+@$core.Deprecated('Use resultErrorDescriptor instead')
+const ResultError$json = {
+  '1': 'ResultError',
+  '2': [
+    {'1': 'not_found', '3': 1, '4': 1, '5': 11, '6': '.CanClient.NotFound', '9': 0, '10': 'notFound'},
+    {'1': 'offline', '3': 2, '4': 1, '5': 11, '6': '.CanClient.Offline', '9': 0, '10': 'offline'},
+  ],
+  '8': [
+    {'1': 'error'},
+  ],
+};
+
+/// Descriptor for `ResultError`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List resultErrorDescriptor = $convert.base64Decode(
+    'CgtSZXN1bHRFcnJvchIyCglub3RfZm91bmQYASABKAsyEy5DYW5DbGllbnQuTm90Rm91bmRIAF'
+    'IIbm90Rm91bmQSLgoHb2ZmbGluZRgCIAEoCzISLkNhbkNsaWVudC5PZmZsaW5lSABSB29mZmxp'
+    'bmVCBwoFZXJyb3I=');
+
+@$core.Deprecated('Use vehicleMetaResultDescriptor instead')
+const VehicleMetaResult$json = {
+  '1': 'VehicleMetaResult',
+  '2': [
+    {'1': 'vehicle', '3': 1, '4': 1, '5': 11, '6': '.CanClient.Vehicle', '9': 0, '10': 'vehicle'},
+    {'1': 'error', '3': 2, '4': 1, '5': 11, '6': '.CanClient.ResultError', '9': 0, '10': 'error'},
+  ],
+  '8': [
+    {'1': 'result'},
+  ],
+};
+
+/// Descriptor for `VehicleMetaResult`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List vehicleMetaResultDescriptor = $convert.base64Decode(
+    'ChFWZWhpY2xlTWV0YVJlc3VsdBIuCgd2ZWhpY2xlGAEgASgLMhIuQ2FuQ2xpZW50LlZlaGljbG'
+    'VIAFIHdmVoaWNsZRIuCgVlcnJvchgCIAEoCzIWLkNhbkNsaWVudC5SZXN1bHRFcnJvckgAUgVl'
+    'cnJvckIICgZyZXN1bHQ=');
+

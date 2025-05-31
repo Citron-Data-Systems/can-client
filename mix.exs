@@ -52,7 +52,6 @@ defmodule CanClient.MixProject do
       {:circuits_i2c, "~> 2.1"},
       {:delux, "~> 0.4.1"},
       {:grpc, "~> 0.9"},
-      {:nerves_flutter_support, "~> 1.0.0"},
       {:protobuf_generate, "~> 0.1.1"},
       {:canbus, github: "rozap/canbus"},
       # Dependencies for specific targets
@@ -74,7 +73,7 @@ defmodule CanClient.MixProject do
        runtime: false,
        targets: :citron_rpi5,
        nerves: [compile: true]},
-
+      {:nerves_flutter_support, github: "nerves-flutter/nerves_flutter_support", branch: "digit/package-mesa3d-mesa3d-headers-bump-version-to-25.0.2"}
       # {:nerves_system_bbb, "~> 2.19", runtime: false, targets: :bbb},
       # {:nerves_system_osd32mp1, "~> 0.15", runtime: false, targets: :osd32mp1},
       # {:nerves_system_x86_64, "~> 1.24", runtime: false, targets: :x86_64},
@@ -90,13 +89,17 @@ defmodule CanClient.MixProject do
       # See https://hexdocs.pm/nerves_pack/readme.html#erlang-distribution
       cookie: "#{@app}_cookie",
       include_erts: &Nerves.Release.erts/0,
-      steps: [&Nerves.Release.init/1, &NervesFlutterSupport.InstallRuntime.run/1, &NervesFlutterSupport.BuildFlutterApp.run/1, :assemble],
+      steps: [
+        &Nerves.Release.init/1,
+        &NervesFlutterSupport.InstallRuntime.run/1,
+        &NervesFlutterSupport.BuildFlutterApp.run/1,
+        :assemble
+      ],
       strip_beams: Mix.env() == :prod or [keep: ["Docs"]],
       flutter: [
-        project_dir: "flutter_app/can_ui",
+        project_dir: "flutter_app"
         # output_dir: "/app/build/aot_output/path/",
-      ],
-
+      ]
     ]
   end
 end

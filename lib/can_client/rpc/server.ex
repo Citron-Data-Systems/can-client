@@ -56,11 +56,68 @@ defmodule CanClient.RPC.Server do
     end
   end
 
+  defp ok(result_type, key, value) do
+    struct(result_type, %{result: {key, value}})
+  end
+
+  defp error(result_type, error_key, error_struct) do
+    struct(result_type, %{
+      result: {:error, %CanClient.ResultError{error: {error_key, error_struct}}}
+    })
+
+  end
+
+  defp not_found(result_type), do: error(result_type, :not_found, %CanClient.NotFound{})
+  defp offline(result_type), do: error(result_type, :offline, %CanClient.Offline{})
+
+  defp publish_vehicle_defs(stream) do
+    receive do
+      {StateHolder, _topic, vehicle} ->
+        Logger.info("Sending new vehicle defn to ui")
+
+        Server.send_reply(
+          stream,
+          ok(
+            CanClient.VehicleMetaResult,
+            :vehicle,
+            Util.api_to_proto(vehicle)
+          )
+        )
+
+        publish_vehicle_defs(stream)
+        # code
+    end
+  end
+
+  def vehicle_meta(_request, stream) do
+    case DefinitionManager.get_vehicle() do
+      {:ok, vehicle} ->
+        Server.send_reply(
+          stream,
+          ok(
+            CanClient.VehicleMetaResult,
+            :vehicle,
+            Util.api_to_proto(vehicle)
+          )
+        )
 
 
+      {:error, :offline} ->
+        Server.send_reply(stream, offline(CanClient.VehicleMetaResult))
+      {:error, :not_found} ->
+        Server.send_reply(stream, not_found(CanClient.VehicleMetaResult))
+    end
 
-  def vehicle_meta(_request, _stream) do
-    {:ok, vehicle} = DefinitionManager.get_vehicle()
-    Util.api_to_proto(vehicle) |> IO.inspect
+    {_, ref} =
+      spawn_monitor(fn ->
+        Logger.info("Streaming vehicle defs from me")
+        StateHolder.sub([DefinitionManager.emitter_topic()])
+        publish_vehicle_defs(stream)
+      end)
+
+    receive do
+      {:DOWN, ^ref, :process, _pid, reason} ->
+        Logger.info("Done streaming signals #{inspect(reason)}")
+    end
   end
 end

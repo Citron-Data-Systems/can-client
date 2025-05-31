@@ -125,11 +125,20 @@ defmodule CanClient.Rpc.Util do
     }
   end
 
+
+  defp to_float(b) when is_binary(b) do
+    {f, _} = Float.parse(b)
+    f
+  end
+  defp to_float(f) when is_float(f), do: f
+  defp to_float(i) when is_integer(i), do: i * 1.0
+  defp to_float(nil), do: nil
+
   # Convert gauge zone
   defp convert_gauge_zone(%{"start" => start, "end" => end_val, "color" => color}) do
     %CanClient.GaugeZone{
-      start: start,
-      end: end_val,
+      start: to_float(start),
+      end: to_float(end_val),
       color: color
     }
   end

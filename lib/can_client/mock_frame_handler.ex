@@ -3,6 +3,7 @@ defmodule CanClient.MockFrameHandler do
   alias CanClient.CanNet
   use GenServer
   require Logger
+  alias CanClient.FrameHandler
 
   @receivers [
     WorldStateWriter
@@ -206,25 +207,41 @@ defmodule CanClient.MockFrameHandler do
   """
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, [])
+    GenServer.start_link(__MODULE__, [nil])
   end
 
-  def init(_) do
+
+  def simulate() do
+    GenServer.start_link(__MODULE__, [FrameHandler])
+  end
+
+
+  def init([send_to]) do
     {:ok, dbc} = Canbus.Dbc.parse(@dbc)
     :timer.send_interval(33, :frames)
 
-    state =
-      Enum.map(@receivers, fn mod ->
-        {:ok, state} = mod.init()
-        {mod, state}
-      end)
-      |> Enum.into(%{})
+    case send_to do
+      FrameHandler ->
+        Logger.info("Starting mock fram handler assuming that CanNet is running!")
+        {:ok, {FrameHandler, dbc, System.monotonic_time(:millisecond)}}
 
-    {:ok, {state, dbc, System.monotonic_time(:millisecond)}}
+      _ ->
+        Logger.info("Starting mock frame handler in host mode")
+
+        state =
+          Enum.map(@receivers, fn mod ->
+            {:ok, state} = mod.init()
+            {mod, state}
+          end)
+          |> Enum.into(%{})
+
+        {:ok, {state, dbc, System.monotonic_time(:millisecond)}}
+    end
   end
 
   defp gen_random(dbc, start_time) do
     period_seconds = 5
+
     Enum.flat_map(dbc.message, fn {can_id, message} ->
       values =
         Enum.map(message.signals, fn sig ->
@@ -261,6 +278,13 @@ defmodule CanClient.MockFrameHandler do
     end)
   end
 
+  def handle_info(:frames, {FrameHandler, dbc, t} = state) do
+    pid = Process.whereis(FrameHandler)
+    fake = gen_random(dbc, t)
+    send(pid, {:frames, fake})
+    {:noreply, state}
+  end
+
   def handle_info(:frames, {state, dbc, t}) do
     fake = gen_random(dbc, t)
 
@@ -271,5 +295,18 @@ defmodule CanClient.MockFrameHandler do
       end)
 
     {:noreply, {new_state, dbc, t}}
+  end
+
+
+  defp wreak_havoc() do
+    Enum.random(:erlang.processes) |> Process.exit(:die)
+    Process.sleep(500)
+    wreak_havoc()
+  end
+
+  def chaos_monkey() do
+    spawn(fn ->
+      wreak_havoc()
+    end)
   end
 end

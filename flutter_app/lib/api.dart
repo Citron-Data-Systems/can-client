@@ -41,7 +41,7 @@ class API {
     return _client!.streamEcho(Empty());
   }
 
-  static Future<Vehicle> vehicleMeta() {
+  static ResponseStream<VehicleMetaResult> vehicleMeta() {
     return _client!.vehicleMeta(Empty());
   }
 

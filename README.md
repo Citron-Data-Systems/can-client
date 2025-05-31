@@ -3,14 +3,13 @@ Uses an MCP2515 to read can messages, does stuff with them
 
 
 ## TODO
-* create citronAPI genserver which holds the websocket
-  * connect to websocket async
-  * have disconnected state - don't crash on disconnect
-* frame_writer creates a CAN channel
-* display_api has a vehicle channel
-  * vehicle channel gets the dashboard
 
+* fix labels on linear gauge dart component
+* fix tick marks on circular gauge dart component
+* status component
+  * for fan state or
 
+### BUGS
 
 ## Notes
 

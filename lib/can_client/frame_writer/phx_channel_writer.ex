@@ -4,11 +4,24 @@ defmodule CanClient.FrameWriter.PhxChannelWriter do
   require Logger
 
   @behaviour CanClient.FrameHandler.FrameWriter
-
+  @batch_size 30
   def init() do
-    spawn_link(fn ->
-      run()
-    end)
+    pid =
+      spawn_link(fn ->
+        run()
+      end)
+
+    {:ok, {pid, []}}
+  end
+
+  def handle_frames(frames, {pid, buf}) do
+    acc = buf ++ frames
+    if length(acc) > @batch_size do
+      send(pid, {:frames, acc})
+      {pid, []}
+    else
+      {pid, acc}
+    end
   end
 
   def run() do
@@ -37,16 +50,16 @@ defmodule CanClient.FrameWriter.PhxChannelWriter do
 
   defp recv_frames(channel) do
     receive do
-      {:frames, frames} ->
-        b =
-          Enum.map(frames, fn
-            {:frame, {id, time, data}} ->
-              [id, time, data]
+      %PhoenixClient.Message{
+        payload: %{
+          "response" => %{"reason" => "unmatched topic"},
+          "status" => "error"
+        }
+      } ->
+        raise RuntimeError, message: "Channel error, restart me"
 
-            {:error, _} ->
-              []
-          end)
-          |> :erlang.term_to_binary(compressed: 9)
+      {:frames, frames} ->
+        b = :erlang.term_to_binary(frames, compressed: 9)
 
         res =
           PhoenixClient.Channel.push_async(
@@ -57,14 +70,16 @@ defmodule CanClient.FrameWriter.PhxChannelWriter do
             }
           )
 
-        blink_frames_sent_to_server()
+        # blink_frames_sent_to_server()
         Logger.info("Sent frames #{inspect(res)} #{byte_size(b)} bytes")
+        recv_frames(channel)
+      other ->
+        Logger.warning("Ignoring message #{inspect other}")
+        recv_frames(channel)
     end
   end
 
-  def handle_frames(frames, pid) do
-    send(pid, {:frames, frames})
-  end
+
 
   defp blink_frames_sent_to_server() do
     Delux.render(

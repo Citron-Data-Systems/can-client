@@ -2,33 +2,40 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
   @behaviour CanClient.FrameHandler.FrameWriter
 
   defmodule DefinitionManager do
+    alias CanClient.FrameWriter.WorldStateWriter.StateHolder
     alias CanClient.CitronAPI
     use GenServer
     require Logger
 
     defmodule State do
-      defstruct [:dets_tab, :chan]
+      defstruct [:dets_tab]
     end
 
     def start_link(_) do
       GenServer.start_link(__MODULE__, [])
     end
 
+    def emitter_topic(), do: "__vehicle_defn"
+
     defp dets_name(), do: :vehicle_defn
     @vehicle_definition :vehicle_def
     @dbc_definition :dbc_def
 
     def init(_) do
-      send(self(), :connect)
+      connect(self())
 
-      :ets.new(__MODULE__, [
-        :set,
-        :protected,
-        :named_table,
-        {:read_concurrency, true}
-      ])
+      unless Enum.member?(:ets.all(), __MODULE__) do
+        :ets.new(__MODULE__, [
+          :set,
+          :public,
+          :named_table,
+          {:read_concurrency, true}
+        ])
+      end
 
-      {:ok, dets_tab} = :dets.open_file(dets_name(), type: :set, file: ~c"vehicle_dfn.dets")
+      file = Application.get_env(:can_client, :vehicle_meta_location)
+
+      {:ok, dets_tab} = :dets.open_file(dets_name(), type: :set, file: String.to_charlist(file))
 
       case :dets.lookup(dets_tab, @vehicle_definition) do
         [{_key, v_def}] ->
@@ -65,37 +72,72 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
     defp save_def(dets_tab, v_def) do
       :dets.insert(dets_tab, {@vehicle_definition, v_def})
       load_def(v_def)
+      StateHolder.pub([{emitter_topic(), v_def}])
       Logger.info("Inserted new vehicle definition")
       :ok
     end
 
-    def handle_info(:connect, state) do
-      case CitronAPI.join("vehicle_meta:#{CanClient.Application.get_vehicle_id()}") do
-        {:ok, _res, chan} ->
-          send(self(), :check_updates)
-          {:noreply, %State{state | chan: chan}}
+    def handle_info({:save_def, v_def}, state) do
+      save_def(state.dets_tab, v_def)
+      {:noreply, state}
+    end
 
-        failure ->
-          Logger.info("Failed to connect to vehicle metadata channel #{inspect(failure)}")
-          :timer.send_after(5000, :connect)
-          {:noreply, state}
+    defp handle_updates(owner, chan) do
+      receive do
+        %PhoenixClient.Message{event: "update", payload: v_def} ->
+          send(owner, {:save_def, v_def})
+          handle_updates(owner, chan)
       end
     end
 
-    def handle_info(:check_updates, state) do
-      case PhoenixClient.Channel.push(state.chan, "get", %{}) do
+    defp on_join_channel(owner, chan) do
+      Logger.info("Successfully connected to vehicle metadata channel, asking for vehicle def")
+
+      case PhoenixClient.Channel.push(chan, "get", %{}) do
         {:ok, v_def} ->
-          save_def(state.dets_tab, v_def)
+          send(owner, {:save_def, v_def})
           :ok
       end
 
-      {:noreply, state}
+      handle_updates(owner, chan)
+    end
+
+    def connect(owner) do
+      spawn(fn ->
+        case CitronAPI.join("vehicle_meta:#{CanClient.Application.get_vehicle_id()}") do
+          # TODO: subscripe for realtime updates here
+          {:ok, _res, chan} ->
+            on_join_channel(owner, chan)
+
+          {:error, {:already_joined, chan}} ->
+            on_join_channel(owner, chan)
+
+          failure ->
+            Logger.info("Failed to connect to vehicle metadata channel #{inspect(failure)}")
+            Process.sleep(5000)
+            connect(owner)
+        end
+      end)
+
+      :ok
+    end
+
+    defp not_found_or_disconnected() do
+      if CitronAPI.is_connected?() do
+        {:error, :not_found}
+      else
+        {:error, :offline}
+      end
     end
 
     def get_vehicle() do
       case :ets.lookup(__MODULE__, @vehicle_definition) do
-        [{@vehicle_definition, v_def}] -> {:ok, v_def}
-        _ -> {:error, :not_found}
+        [{@vehicle_definition, v_def}] ->
+          {:ok, v_def}
+
+        _ ->
+          Logger.warning("No vehicle found, defaulting to simple dash")
+          not_found_or_disconnected()
       end
     end
 
@@ -105,29 +147,30 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
           {:ok, parsed}
 
         _ ->
-          {:error, :not_found}
+          not_found_or_disconnected()
       end
     end
 
     def decode(id, bytes) do
-      case get_dbc(id) do
-        {:ok, dbc} ->
-          try do
+      try do
+        case get_dbc(id) do
+          {:ok, dbc} ->
             Canbus.Decode.decode(dbc, {id, nil, bytes})
-          rescue
-            e ->
-              Logger.error(Exception.format(:error, e, __STACKTRACE__))
-              Logger.error("Failed to decode message #{id} #{inspect(e)}")
-              nil
-          end
 
-        _ ->
-          :ok
+          _ ->
+            :ok
+        end
+      rescue
+        e ->
+          Logger.error(Exception.format(:error, e, __STACKTRACE__))
+          Logger.error("Failed to decode message #{id} #{inspect(e)}")
+          nil
       end
     end
   end
 
   defmodule StateHolder do
+    require Logger
     use GenServer
 
     def start_link(_) do
@@ -135,6 +178,7 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
     end
 
     def init(_) do
+      Logger.info("World state holder is up")
       {:ok, {%{}, %{}}}
     end
 
@@ -151,13 +195,13 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
       {:noreply, {ws, subscriptions}}
     end
 
-    def handle_cast({:sub, signals, who}, {ws, subscriptions}) do
+    def handle_cast({:sub, topics, who}, {ws, subscriptions}) do
       _ref = Process.monitor(who)
 
       subscriptions =
-        Enum.reduce(signals, subscriptions, fn signal, acc ->
-          existing = Map.get(acc, signal, [])
-          Map.put(acc, signal, Enum.uniq([who | existing]))
+        Enum.reduce(topics, subscriptions, fn topic, acc ->
+          existing = Map.get(acc, topic, [])
+          Map.put(acc, topic, Enum.uniq([who | existing]))
         end)
 
       {:noreply, {ws, subscriptions}}
@@ -181,8 +225,33 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
       GenServer.call(__MODULE__, :get)
     end
 
-    def sub(signals) do
-      GenServer.cast(__MODULE__, {:sub, signals, self()})
+    defp resubscribe_forever(topics, subscriber) do
+      publisher = Process.whereis(__MODULE__)
+
+      ref = Process.monitor(publisher)
+      GenServer.cast(publisher, {:sub, topics, subscriber})
+
+      receive do
+        {:DOWN, ^ref, :process, _pid, reason} ->
+          Logger.warning(
+            "Process #{inspect(publisher)} exited with #{inspect(reason)}, resubscribing"
+          )
+
+          # hmm
+          Process.sleep(100)
+
+          resub = Process.whereis(__MODULE__)
+          Logger.info("Resubscribing now to #{inspect(resub)}")
+          resubscribe_forever(topics, subscriber)
+      end
+    end
+
+    def sub(topics) do
+      subscriber = self()
+
+      spawn_link(fn ->
+        resubscribe_forever(topics, subscriber)
+      end)
     end
 
     def pub(kvs) do
@@ -191,12 +260,6 @@ defmodule CanClient.FrameWriter.WorldStateWriter do
   end
 
   def init() do
-    {:ok, _pid} =
-      DynamicSupervisor.start_child(CanClient.DynamicSupervisor, {DefinitionManager, []})
-
-    {:ok, _holder} =
-      DynamicSupervisor.start_child(CanClient.DynamicSupervisor, {StateHolder, []})
-
     {:ok, %{}}
   end
 

@@ -4,6 +4,7 @@ defmodule CanClient.Application do
   @moduledoc false
 
   use Application
+  alias NervesFlutterSupport.Udev
 
   defmodule CitronSupervisor do
     use Supervisor
@@ -15,7 +16,9 @@ defmodule CanClient.Application do
     @impl true
     def init([]) do
       children = [
-        {CanClient.CitronAPI, []}
+        {CanClient.CitronAPI, []},
+        {CanClient.FrameWriter.WorldStateWriter.DefinitionManager, []},
+        {CanClient.FrameWriter.WorldStateWriter.StateHolder, []},
       ]
 
       # effectively infinite restarts
@@ -57,28 +60,34 @@ defmodule CanClient.Application do
 
     launch_env = %{
       "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}",
-      "GALLIUM_HUD" => "cpu+fps",
-      "GALLIUM_HUD_PERIOD" => "0.25",
-      "GALLIUM_HUD_SCALE" => "3",
-      "GALLIUM_HUD_VISIBLE" => "false",
-      "GALLIUM_HUD_TOGGLE_SIGNAL" => "10"
+      # "GALLIUM_HUD" => "cpu+fps",
+      # "GALLIUM_HUD_PERIOD" => "0.25",
+      # "GALLIUM_HUD_SCALE" => "3",
+      # "GALLIUM_HUD_VISIBLE" => "false",
+      # "GALLIUM_HUD_TOGGLE_SIGNAL" => "10",
+      # "FLUTTER_LOG_LEVELS" => "TRACE"
     }
 
-    [
-      # Create a child that runs the Flutter embedder.
-      # The `:app_name` matches this application, since it contains the AOT bundle at `priv/flutter_app`.
-      # See the doc annotation for `create_child/1` for all valid options.
-    ]
+    # [
+    #   # Create a child that runs the Flutter embedder.
+    #   # The `:app_name` matches this application, since it contains the AOT bundle at `priv/flutter_app`.
+    #   # See the doc annotation for `create_child/1` for all valid options.
+    # ]
 
     [
-      {CanClient.CanNet},
+      {CanClient.CanNet, []},
       {Delux, [indicators: %{default: %{green: "ACT", red: "PWR"}}]},
       {CanClient.FrameHandler, []},
       NervesFlutterSupport.Flutter.Engine.create_child(
         app_name: :can_client,
-        env: launch_env
+        env: launch_env,
+        args: [
+
+        ]
       )
     ]
+
+
   end
 
   defp get_output_card() do

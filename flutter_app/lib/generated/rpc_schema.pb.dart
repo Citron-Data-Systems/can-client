@@ -1085,6 +1085,236 @@ class Vehicle extends $pb.GeneratedMessage {
   void clearUid() => clearField(6);
 }
 
+class NotFound extends $pb.GeneratedMessage {
+  factory NotFound() => create();
+  NotFound._() : super();
+  factory NotFound.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory NotFound.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NotFound', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  NotFound clone() => NotFound()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  NotFound copyWith(void Function(NotFound) updates) => super.copyWith((message) => updates(message as NotFound)) as NotFound;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static NotFound create() => NotFound._();
+  NotFound createEmptyInstance() => create();
+  static $pb.PbList<NotFound> createRepeated() => $pb.PbList<NotFound>();
+  @$core.pragma('dart2js:noInline')
+  static NotFound getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NotFound>(create);
+  static NotFound? _defaultInstance;
+}
+
+class Offline extends $pb.GeneratedMessage {
+  factory Offline() => create();
+  Offline._() : super();
+  factory Offline.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Offline.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Offline', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Offline clone() => Offline()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Offline copyWith(void Function(Offline) updates) => super.copyWith((message) => updates(message as Offline)) as Offline;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Offline create() => Offline._();
+  Offline createEmptyInstance() => create();
+  static $pb.PbList<Offline> createRepeated() => $pb.PbList<Offline>();
+  @$core.pragma('dart2js:noInline')
+  static Offline getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Offline>(create);
+  static Offline? _defaultInstance;
+}
+
+enum ResultError_Error {
+  notFound, 
+  offline, 
+  notSet
+}
+
+class ResultError extends $pb.GeneratedMessage {
+  factory ResultError({
+    NotFound? notFound,
+    Offline? offline,
+  }) {
+    final $result = create();
+    if (notFound != null) {
+      $result.notFound = notFound;
+    }
+    if (offline != null) {
+      $result.offline = offline;
+    }
+    return $result;
+  }
+  ResultError._() : super();
+  factory ResultError.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ResultError.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static const $core.Map<$core.int, ResultError_Error> _ResultError_ErrorByTag = {
+    1 : ResultError_Error.notFound,
+    2 : ResultError_Error.offline,
+    0 : ResultError_Error.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ResultError', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..aOM<NotFound>(1, _omitFieldNames ? '' : 'notFound', subBuilder: NotFound.create)
+    ..aOM<Offline>(2, _omitFieldNames ? '' : 'offline', subBuilder: Offline.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ResultError clone() => ResultError()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ResultError copyWith(void Function(ResultError) updates) => super.copyWith((message) => updates(message as ResultError)) as ResultError;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ResultError create() => ResultError._();
+  ResultError createEmptyInstance() => create();
+  static $pb.PbList<ResultError> createRepeated() => $pb.PbList<ResultError>();
+  @$core.pragma('dart2js:noInline')
+  static ResultError getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ResultError>(create);
+  static ResultError? _defaultInstance;
+
+  ResultError_Error whichError() => _ResultError_ErrorByTag[$_whichOneof(0)]!;
+  void clearError() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  NotFound get notFound => $_getN(0);
+  @$pb.TagNumber(1)
+  set notFound(NotFound v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasNotFound() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNotFound() => clearField(1);
+  @$pb.TagNumber(1)
+  NotFound ensureNotFound() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  Offline get offline => $_getN(1);
+  @$pb.TagNumber(2)
+  set offline(Offline v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasOffline() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearOffline() => clearField(2);
+  @$pb.TagNumber(2)
+  Offline ensureOffline() => $_ensure(1);
+}
+
+enum VehicleMetaResult_Result {
+  vehicle, 
+  error, 
+  notSet
+}
+
+class VehicleMetaResult extends $pb.GeneratedMessage {
+  factory VehicleMetaResult({
+    Vehicle? vehicle,
+    ResultError? error,
+  }) {
+    final $result = create();
+    if (vehicle != null) {
+      $result.vehicle = vehicle;
+    }
+    if (error != null) {
+      $result.error = error;
+    }
+    return $result;
+  }
+  VehicleMetaResult._() : super();
+  factory VehicleMetaResult.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory VehicleMetaResult.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static const $core.Map<$core.int, VehicleMetaResult_Result> _VehicleMetaResult_ResultByTag = {
+    1 : VehicleMetaResult_Result.vehicle,
+    2 : VehicleMetaResult_Result.error,
+    0 : VehicleMetaResult_Result.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'VehicleMetaResult', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..aOM<Vehicle>(1, _omitFieldNames ? '' : 'vehicle', subBuilder: Vehicle.create)
+    ..aOM<ResultError>(2, _omitFieldNames ? '' : 'error', subBuilder: ResultError.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  VehicleMetaResult clone() => VehicleMetaResult()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  VehicleMetaResult copyWith(void Function(VehicleMetaResult) updates) => super.copyWith((message) => updates(message as VehicleMetaResult)) as VehicleMetaResult;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static VehicleMetaResult create() => VehicleMetaResult._();
+  VehicleMetaResult createEmptyInstance() => create();
+  static $pb.PbList<VehicleMetaResult> createRepeated() => $pb.PbList<VehicleMetaResult>();
+  @$core.pragma('dart2js:noInline')
+  static VehicleMetaResult getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<VehicleMetaResult>(create);
+  static VehicleMetaResult? _defaultInstance;
+
+  VehicleMetaResult_Result whichResult() => _VehicleMetaResult_ResultByTag[$_whichOneof(0)]!;
+  void clearResult() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  Vehicle get vehicle => $_getN(0);
+  @$pb.TagNumber(1)
+  set vehicle(Vehicle v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasVehicle() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearVehicle() => clearField(1);
+  @$pb.TagNumber(1)
+  Vehicle ensureVehicle() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  ResultError get error => $_getN(1);
+  @$pb.TagNumber(2)
+  set error(ResultError v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasError() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearError() => clearField(2);
+  @$pb.TagNumber(2)
+  ResultError ensureError() => $_ensure(1);
+}
+
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

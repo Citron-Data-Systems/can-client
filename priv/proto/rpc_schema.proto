@@ -104,6 +104,23 @@ message Vehicle {
   string uid = 6;
 }
 
+message NotFound {};
+message Offline {};
+
+message ResultError {
+  oneof error {
+    NotFound not_found = 1;
+    Offline offline = 2;
+  }
+}
+
+message VehicleMetaResult {
+  oneof result {
+    Vehicle vehicle = 1;
+    ResultError error = 2;
+  }
+}
+
 // The actual RPC service definition with HTTP/2 endpoints defined
 service RPC {
   rpc Echo (Empty) returns (EchoResult) {
@@ -124,7 +141,7 @@ service RPC {
     };
   }
 
-  rpc VehicleMeta (Empty) returns (Vehicle) {
+  rpc VehicleMeta (Empty) returns (stream VehicleMetaResult) {
     option (google.api.http) = {
         get: "/vehicleMeta"
     };

@@ -17,16 +17,40 @@ defmodule CanClient.FrameHandler do
   ]
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, [])
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
   def init(_) do
+    Logger.info("CAN Frame handler is starting!")
     send(self(), :setup)
+    log = spawn_link(fn -> log_loop(:erlang.system_time(:millisecond), 0) end)
 
-    {:ok, {%{}, nil}}
+    {:ok, {%{}, nil, log}}
   end
 
+  defp log_loop(t, acc) do
+    count =
+      receive do
+        {:recv, count} ->
+          acc + count
+      after
+        5_000 ->
+          Logger.info("Received no CAN messages in last 5s")
+          0
+      end
 
+    now = :erlang.system_time(:millisecond)
+
+    count =
+      if now - t > 5_000 do
+        Logger.info("Received #{count} messages")
+        0
+      else
+        count
+      end
+
+    log_loop(now, count)
+  end
 
   defp frame_read_loop(parent, socket, buf) do
     frames = Cand.Protocol.receive_frame(socket)
@@ -42,6 +66,7 @@ defmodule CanClient.FrameHandler do
 
     frame_read_loop(parent, socket, buf)
   end
+
   defp frame_write_loop(parent, socket) do
     receive do
       {:write_frame, can_id, frame, ref, reply_to} ->
@@ -78,31 +103,27 @@ defmodule CanClient.FrameHandler do
     end)
   end
 
-
-  def handle_info(:setup, {r_state, _}) do
+  def handle_info(:setup, {r_state, _, log}) do
     r_state =
       Enum.reduce(@receivers, r_state, fn mod, acc ->
+        # TODO: spawn_monitor here to isolate all the receivers -
         {:ok, state} = mod.init()
         Map.put(acc, mod, state)
       end)
 
-    {:noreply, {r_state, can_connection()}}
+    Logger.info("CAN Frame loop init")
+    {:noreply, {r_state, can_connection(), log}}
   end
 
-  def handle_info({:frames, buf}, {receivers, can}) do
-    Logger.info(
-      "Got #{length(buf)} CAN frames #{inspect(Enum.map(buf, fn {:frame, {id, _, _}} -> id end))}"
-    )
+  def handle_info({:frames, buf}, {receivers, can, log}) do
+    send(log, {:recv, length(buf)})
 
     r_state =
-      Enum.reduce(receivers, fn {r, state}, acc ->
+      Enum.reduce(receivers, receivers, fn {r, state}, acc ->
         Map.put(acc, r, r.handle_frames(buf, state))
       end)
 
-    # update_worldstate(buf)
-    # dump_frames(channel, buf)
-    # blink_frames_sent_to_server()
-    {:noreply, {r_state, can}}
+    {:noreply, {r_state, can, log}}
   end
 
   # defp blink_frame_sent_to_bus() do

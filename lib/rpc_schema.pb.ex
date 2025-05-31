@@ -128,6 +128,36 @@ defmodule CanClient.Vehicle do
   field :uid, 6, type: :string
 end
 
+defmodule CanClient.NotFound do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+end
+
+defmodule CanClient.Offline do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+end
+
+defmodule CanClient.ResultError do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  oneof :error, 0
+
+  field :not_found, 1, type: CanClient.NotFound, json_name: "notFound", oneof: 0
+  field :offline, 2, type: CanClient.Offline, oneof: 0
+end
+
+defmodule CanClient.VehicleMetaResult do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  oneof :result, 0
+
+  field :vehicle, 1, type: CanClient.Vehicle, oneof: 0
+  field :error, 2, type: CanClient.ResultError, oneof: 0
+end
+
 defmodule CanClient.RPC.Service do
   @moduledoc false
 
@@ -175,7 +205,7 @@ defmodule CanClient.RPC.Service do
     }
   })
 
-  rpc(:VehicleMeta, CanClient.Empty, CanClient.Vehicle, %{
+  rpc(:VehicleMeta, CanClient.Empty, stream(CanClient.VehicleMetaResult), %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{

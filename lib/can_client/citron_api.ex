@@ -11,51 +11,35 @@ defmodule CanClient.CitronAPI do
     {:ok, nil}
   end
 
-  defp await_connected(_socket, max_attempts, max_attempts) do
-    {:error, "Failed to connect to phx channel after #{max_attempts} tries"}
-  end
-
-  defp await_connected(socket, attempts, max_attempts) do
-    if not PhoenixClient.Socket.connected?(socket) do
-      Process.sleep(500 * attempts)
-      Logger.info("Await connection attempt #{attempts}/#{max_attempts}")
-      await_connected(socket, attempts + 1, max_attempts)
-    else
-      Logger.info("Connected to phx socket")
-      IO.inspect(socket)
-      {:ok, socket}
-    end
-  end
-
-  def connect() do
+  defp connect() do
     socket_opts = [
       url: Application.get_env(:can_client, :ws_url)
     ]
 
     Logger.info("Connecting to socket #{inspect(socket_opts)}")
 
-    with {:ok, socket} <- PhoenixClient.Socket.start_link(socket_opts) do
-      await_connected(socket, 0, 3)
-    end
+    PhoenixClient.Socket.start_link(socket_opts)
   end
 
   def handle_info(:connect, _socket) do
-    case connect() do
-      {:ok, socket} ->
-        {:noreply, socket}
-
-      {:error, reason} ->
-        Logger.warning("Failed to connect to the citron websocket #{reason}")
-        {:stop, reason}
-    end
+    {:ok, socket} = connect()
+    {:noreply, socket}
   end
 
   def handle_call(:get, _from, nil) do
-    {:reply, {:error, :disconnected}, nil}
+    {:reply, {:error, :offline}, nil}
   end
 
   def handle_call(:get, _from, socket) do
-    {:reply, {:ok, socket}, socket}
+    if not PhoenixClient.Socket.connected?(socket) do
+      {:reply, {:error, :offline}, socket}
+    else
+      {:reply, {:ok, socket}, socket}
+    end
+  end
+
+  def handle_call(:is_connected, _from, socket) do
+    {:reply, PhoenixClient.Socket.connected?(socket), socket}
   end
 
   def join(topic) do
@@ -63,5 +47,9 @@ defmodule CanClient.CitronAPI do
       Logger.info("Joining #{topic}")
       PhoenixClient.Channel.join(socket, topic)
     end
+  end
+
+  def is_connected?() do
+    GenServer.call(__MODULE__, :is_connected)
   end
 end

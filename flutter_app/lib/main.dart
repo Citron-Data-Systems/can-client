@@ -1,33 +1,44 @@
 import 'package:can_ui/api.dart';
 import 'package:can_ui/generated/rpc_schema.pb.dart';
+import 'package:can_ui/widgets/gauge/gauge.dart';
 import 'package:flutter/material.dart';
-import 'package:can_ui/gauge.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:logging/logging.dart';
+// import 'package:window_manager/window_manager.dart';
 
-import 'package:window_manager/window_manager.dart';
+const screenSize = Size(800, 480);
 
-const screenSize = Size(840, 430);
+void setupLogger() {
+  Logger.root.level = Level.ALL; // defaults to Level.INFO
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+}
+
+final logger = Logger('CanClientUI');
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
-  WindowOptions windowOptions = const WindowOptions(
-    size: screenSize,
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
-    windowButtonVisibility: true,
+  setupLogger();
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await windowManager.ensureInitialized();
+  // WindowOptions windowOptions = const WindowOptions(
+  //   size: screenSize,
+  //   center: true,
+  //   backgroundColor: Colors.transparent,
+  //   skipTaskbar: false,
+  //   titleBarStyle: TitleBarStyle.normal,
+  //   windowButtonVisibility: true,
 
-    // IRL we probably want:
-    // skipTaskbar: true,
-    // titleBarStyle: TitleBarStyle.hidden,
-    // windowButtonVisibility: false, // TODO
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
-
+  //   // IRL we probably want:
+  //   // skipTaskbar: true,
+  //   // titleBarStyle: TitleBarStyle.hidden,
+  //   // windowButtonVisibility: false, // TODO
+  // );
+  // windowManager.waitUntilReadyToShow(windowOptions, () async {
+  //   await windowManager.show();
+  //   await windowManager.focus();
+  // });
+  logger.info("Starting app");
   runApp(const MyApp());
 }
 
@@ -39,23 +50,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.dark(),
-      ),
+      ).copyWith(textTheme: GoogleFonts.latoTextTheme()),
       home: const MyHomePage(),
     );
   }
@@ -67,9 +63,18 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _Home();
 }
 
+double unitW() {
+  return (screenSize.width / 12.0);
+}
+
+double unitH() {
+  return (screenSize.height / 12.0);
+}
+
 class _Home extends State<MyHomePage> {
   Vehicle? _vehicle;
   List<Widget> _widgets = [];
+  String? _errorMessage = "";
 
   @override
   void initState() {
@@ -77,30 +82,74 @@ class _Home extends State<MyHomePage> {
     _getVehicle();
   }
 
-  _getVehicle() async {
-    API.updateBaseURI();
-    final vehicle = await API.vehicleMeta();
+  _position(Widget w, LayoutInfo layout) {
+    final left = layout.x.toDouble() * unitW();
 
-    List<Widget> working = [];
-    for (var w in vehicle.dashboards.first.widgets) {
-      if (w.hasGauge()) {
-        working.add(_createGaugeWidget(vehicle, w.gauge));
-      } else if (w.hasLineChart()) {
-        working.add(_createLineWidget(vehicle, w.lineChart));
-      }
-    }
-    setState(() {
-      _vehicle = vehicle;
-      _widgets = working;
-    });
+    return Positioned(
+      left: layout.x.toDouble() * unitW(),
+      top: layout.y.toDouble() * unitH(),
+      width: layout.w * unitW(),
+      height: layout.h * unitH(),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.green, width: 1.0),
+        ),
+        child: w,
+      ),
+    );
+  }
+
+  _getVehicle() {
+    API.updateBaseURI();
+    final vehicleStream = API.vehicleMeta();
+    vehicleStream.listen(
+      (result) {
+        if (result.hasVehicle()) {
+          final vehicle = result.vehicle;
+          List<Widget> working = [];
+          for (var w in vehicle.dashboards.first.widgets) {
+            if (w.hasGauge()) {
+              working.add(
+                _position(_createGaugeWidget(vehicle, w.gauge), w.gauge.layout),
+              );
+            } else if (w.hasLineChart()) {
+              working.add(
+                _position(
+                  _createLineWidget(vehicle, w.lineChart),
+                  w.lineChart.layout,
+                ),
+              );
+            }
+          }
+
+          logger.info("Creating dash with ${working.length} widgets");
+          setState(() {
+            _errorMessage = null;
+            _vehicle = vehicle;
+            _widgets = working;
+          });
+        } else {
+          setState(() {
+            _errorMessage =
+                "Failed to find a vehicle definition. ${result.error.toString()}";
+          });
+        }
+      },
+      onError: (error) => {
+        setState(() {
+          _errorMessage =
+              "Fatal error connecting to CAN service. This is not recoverable.";
+        })
+      },
+      onDone: () => {},
+    );
   }
 
   Widget _createGaugeWidget(Vehicle vehicle, GaugeWidget defn) {
     final signalName = defn.columns.first;
 
-    final unitW = (screenSize.width / 12.0);
-    final size = defn.layout.w * unitW;
-    // final size = 300.0;
+    final width = defn.layout.w * unitW();
+    final height = defn.layout.h * unitH();
 
     double? minValue;
     double? maxValue;
@@ -114,20 +163,15 @@ class _Home extends State<MyHomePage> {
         }
       }
     }
-
+    logger.info("Creating gauge ${defn.title}");
     return Gauge(
+      gaugeDefn: defn,
       label: defn.title,
       signalName: signalName,
       maxValue: maxValue!,
       minValue: minValue!,
-      size: size,
-      arcColor: Theme.of(context).splashColor,
-      backgroundColor: Theme.of(context).canvasColor,
-      needleColor: Theme.of(context).primaryColorLight,
-      textColor:
-          Theme.of(context).textTheme.bodySmall?.color ??
-          Theme.of(context).splashColor,
-      zones: defn.style.zones,
+      width: width,
+      height: height,
     );
   }
 
@@ -137,90 +181,61 @@ class _Home extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // var widgets = [
-    //   Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     children: [
-    //       Gauge(
-    //         label: "RPM",
-    //         signalName: "RPM",
-    //         maxValue: 8000,
-    //         minValue: 0,
-    //         size: 300,
-    //         arcColor: Theme.of(context).splashColor,
-    //         backgroundColor: Theme.of(context).canvasColor,
-    //         needleColor: Theme.of(context).primaryColorLight,
-    //         textColor:
-    //             Theme.of(context).textTheme.bodySmall?.color ??
-    //             Theme.of(context).splashColor,
-    //         zones: [
-    //           GaugeZone(start: 6000, end: 7000, color: 'ff0000'),
-    //           // GaugeZone(start: 7000, end: 9000, color: Colors.red),
-    //         ],
-    //       ),
-    //     ],
-    //   ),
-    //   Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     children: [
-    //       Gauge(
-    //         label: "CoolantTemp",
-    //         signalName: "CoolantTemp",
-    //         maxValue: 130,
-    //         minValue: 0,
-    //         size: 300,
-    //         arcColor: Theme.of(context).splashColor,
-    //         backgroundColor: Theme.of(context).canvasColor,
-    //         needleColor: Theme.of(context).primaryColorLight,
-    //         textColor:
-    //             Theme.of(context).textTheme.bodySmall?.color ??
-    //             Theme.of(context).splashColor,
-    //         zones: [
-    //           GaugeZone(start: 85, end: 105, color: '00ff00'),
+    logger.info("Building main app");
+    var child;
 
-    //           GaugeZone(start: 110, end: 130, color: 'ff0000'),
-    //         ],
-    //       ),
-    //     ],
-    //   ),
-    //   Column(
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     children: [
-    //       Gauge(
-    //         label: "OilPress",
-    //         signalName: "OilPress",
-    //         maxValue: 120,
-    //         minValue: 0,
-    //         size: 300,
-    //         arcColor: Theme.of(context).splashColor,
-    //         backgroundColor: Theme.of(context).canvasColor,
-    //         needleColor: Theme.of(context).primaryColorLight,
-    //         textColor:
-    //             Theme.of(context).textTheme.bodySmall?.color ??
-    //             Theme.of(context).splashColor,
-    //         zones: [
-    //           GaugeZone(start: 0, end: 10, color: Colors.red),
-    //           // GaugeZone(start: 10, end: 100, color: Colors.green),
-    //           GaugeZone(start: 100, end: 120, color: Colors.orange),
-    //         ],
-    //       ),
-    //     ],
-    //   ),
-    // ];
+    if (_errorMessage != null) {
+      child = Container(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _errorMessage!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    } else {
+      child = Container(
+          width: screenSize.width,
+          height: screenSize.height,
+          color: Colors.blueGrey,
+          child: Stack(
+            fit: StackFit.expand,
+            alignment: Alignment.topLeft,
+            children: [
+              Positioned(
+                left: 0,
+                top: 0,
+                // Make sure to define width and height for your positioned component
+                width: screenSize.width,
+                height: screenSize.height,
+                child: Container(
+                  // This container constrains the inner stack
+                  color: Colors.black,
+
+                  child: Stack(
+                    // Important: Set fit to StackFit.expand or StackFit.passthrough
+                    fit: StackFit.expand,
+                    clipBehavior: Clip.none,
+                    children: _widgets,
+                  ),
+                ),
+              ),
+              // Other children in the outer stack...
+            ],
+          ));
+    }
 
     return Scaffold(
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: GridView.count(
-          crossAxisCount: 3, // Number of columns in the grid
-          mainAxisSpacing: 0.0, // Spacing between rows
-          crossAxisSpacing: 5.0, // Spacing between columns
-          padding: EdgeInsets.all(5.0), // Padding around the grid
-          shrinkWrap: true, // Use the minimum space needed
-          children: _widgets,
-        ),
-      ),
-    );
+        body: SizedBox(
+            width: screenSize.width, height: screenSize.height, child: child));
   }
 }
