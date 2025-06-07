@@ -1,4 +1,6 @@
 defmodule CanClient.Rpc.Util do
+  require Logger
+
   def api_to_proto(%{
         "id" => id,
         "name" => name,
@@ -73,8 +75,15 @@ defmodule CanClient.Rpc.Util do
     do: convert_line_chart_widget(widget)
 
   defp convert_widget(%{"component" => "gauge"} = widget), do: convert_gauge_widget(widget)
+
+  defp convert_widget(%{"component" => "message_button"} = widget),
+    do: convert_message_widget(widget)
+
   # Skip other widget types
-  defp convert_widget(_), do: nil
+  defp convert_widget(%{"component" => c}) do
+    Logger.warning("Unhandled widget #{c}")
+    nil
+  end
 
   # Convert LineChartWidget
   defp convert_line_chart_widget(%{
@@ -115,6 +124,16 @@ defmodule CanClient.Rpc.Util do
     }
   end
 
+  defp convert_message_widget(%{
+         "layout" => layout
+       }) do
+    %CanClient.DashWidget{
+      widget:
+        {:message_pane,
+         %CanClient.MessagePaneWidget{color: "#00ff00", layout: convert_layout(layout)}}
+    }
+  end
+
   # Convert layout
   defp convert_layout(%{"x" => x, "y" => y, "w" => w, "h" => h}) do
     %CanClient.LayoutInfo{
@@ -125,11 +144,11 @@ defmodule CanClient.Rpc.Util do
     }
   end
 
-
   defp to_float(b) when is_binary(b) do
     {f, _} = Float.parse(b)
     f
   end
+
   defp to_float(f) when is_float(f), do: f
   defp to_float(i) when is_integer(i), do: i * 1.0
   defp to_float(nil), do: nil
@@ -140,6 +159,22 @@ defmodule CanClient.Rpc.Util do
       start: to_float(start),
       end: to_float(end_val),
       color: color
+    }
+  end
+
+  def to_text_value(%{
+        "message" => value,
+        "textColor" => text_color,
+        "backgroundColor" => background_color,
+        "textSize" => size,
+        "flash" => flash
+      }) do
+    %CanClient.TextValue{
+      value: value,
+      textColor: text_color,
+      backgroundColor: background_color,
+      flash: flash,
+      textSize: size
     }
   end
 end

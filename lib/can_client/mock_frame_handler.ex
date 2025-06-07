@@ -1,5 +1,5 @@
 defmodule CanClient.MockFrameHandler do
-  alias CanClient.FrameWriter.{PhxChannelWriter, WorldStateWriter}
+  alias CanClient.FrameHandler.{PhxChannelWriter, WorldStateWriter}
   alias CanClient.CanNet
   use GenServer
   require Logger

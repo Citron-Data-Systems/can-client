@@ -45,4 +45,8 @@ class API {
     return _client!.vehicleMeta(Empty());
   }
 
+  static ResponseStream<TextValue> streamText() {
+    return _client!.streamText(Empty());
+  }
+
 }

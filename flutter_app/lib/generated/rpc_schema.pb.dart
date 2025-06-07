@@ -196,6 +196,112 @@ class SignalSubscription extends $pb.GeneratedMessage {
   void clearSignal() => clearField(1);
 }
 
+class TextValue extends $pb.GeneratedMessage {
+  factory TextValue({
+    $core.String? value,
+    $core.bool? flash,
+    $core.String? backgroundColor,
+    $core.String? textColor,
+    $core.String? textSize,
+  }) {
+    final $result = create();
+    if (value != null) {
+      $result.value = value;
+    }
+    if (flash != null) {
+      $result.flash = flash;
+    }
+    if (backgroundColor != null) {
+      $result.backgroundColor = backgroundColor;
+    }
+    if (textColor != null) {
+      $result.textColor = textColor;
+    }
+    if (textSize != null) {
+      $result.textSize = textSize;
+    }
+    return $result;
+  }
+  TextValue._() : super();
+  factory TextValue.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TextValue.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TextValue', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'value')
+    ..aOB(3, _omitFieldNames ? '' : 'flash')
+    ..aOS(4, _omitFieldNames ? '' : 'backgroundColor', protoName: 'backgroundColor')
+    ..aOS(5, _omitFieldNames ? '' : 'textColor', protoName: 'textColor')
+    ..aOS(6, _omitFieldNames ? '' : 'textSize', protoName: 'textSize')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  TextValue clone() => TextValue()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TextValue copyWith(void Function(TextValue) updates) => super.copyWith((message) => updates(message as TextValue)) as TextValue;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static TextValue create() => TextValue._();
+  TextValue createEmptyInstance() => create();
+  static $pb.PbList<TextValue> createRepeated() => $pb.PbList<TextValue>();
+  @$core.pragma('dart2js:noInline')
+  static TextValue getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TextValue>(create);
+  static TextValue? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get value => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set value($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasValue() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearValue() => clearField(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get flash => $_getBF(1);
+  @$pb.TagNumber(3)
+  set flash($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasFlash() => $_has(1);
+  @$pb.TagNumber(3)
+  void clearFlash() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get backgroundColor => $_getSZ(2);
+  @$pb.TagNumber(4)
+  set backgroundColor($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasBackgroundColor() => $_has(2);
+  @$pb.TagNumber(4)
+  void clearBackgroundColor() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get textColor => $_getSZ(3);
+  @$pb.TagNumber(5)
+  set textColor($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasTextColor() => $_has(3);
+  @$pb.TagNumber(5)
+  void clearTextColor() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get textSize => $_getSZ(4);
+  @$pb.TagNumber(6)
+  set textSize($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasTextSize() => $_has(4);
+  @$pb.TagNumber(6)
+  void clearTextSize() => clearField(6);
+}
+
 /// LayoutInfo represents positioning information in a grid
 class LayoutInfo extends $pb.GeneratedMessage {
   factory LayoutInfo({
@@ -833,9 +939,76 @@ class GaugeWidget extends $pb.GeneratedMessage {
   GaugeStyle ensureStyle() => $_ensure(3);
 }
 
+class MessagePaneWidget extends $pb.GeneratedMessage {
+  factory MessagePaneWidget({
+    $core.String? color,
+    LayoutInfo? layout,
+  }) {
+    final $result = create();
+    if (color != null) {
+      $result.color = color;
+    }
+    if (layout != null) {
+      $result.layout = layout;
+    }
+    return $result;
+  }
+  MessagePaneWidget._() : super();
+  factory MessagePaneWidget.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory MessagePaneWidget.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MessagePaneWidget', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'color')
+    ..aOM<LayoutInfo>(2, _omitFieldNames ? '' : 'layout', subBuilder: LayoutInfo.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  MessagePaneWidget clone() => MessagePaneWidget()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  MessagePaneWidget copyWith(void Function(MessagePaneWidget) updates) => super.copyWith((message) => updates(message as MessagePaneWidget)) as MessagePaneWidget;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static MessagePaneWidget create() => MessagePaneWidget._();
+  MessagePaneWidget createEmptyInstance() => create();
+  static $pb.PbList<MessagePaneWidget> createRepeated() => $pb.PbList<MessagePaneWidget>();
+  @$core.pragma('dart2js:noInline')
+  static MessagePaneWidget getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MessagePaneWidget>(create);
+  static MessagePaneWidget? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get color => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set color($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasColor() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearColor() => clearField(1);
+
+  @$pb.TagNumber(2)
+  LayoutInfo get layout => $_getN(1);
+  @$pb.TagNumber(2)
+  set layout(LayoutInfo v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLayout() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLayout() => clearField(2);
+  @$pb.TagNumber(2)
+  LayoutInfo ensureLayout() => $_ensure(1);
+}
+
 enum DashWidget_Widget {
-  lineChart, 
-  gauge, 
+  lineChart,
+  gauge,
+  messagePane,
   notSet
 }
 
@@ -844,6 +1017,7 @@ class DashWidget extends $pb.GeneratedMessage {
   factory DashWidget({
     LineChartWidget? lineChart,
     GaugeWidget? gauge,
+    MessagePaneWidget? messagePane,
   }) {
     final $result = create();
     if (lineChart != null) {
@@ -851,6 +1025,9 @@ class DashWidget extends $pb.GeneratedMessage {
     }
     if (gauge != null) {
       $result.gauge = gauge;
+    }
+    if (messagePane != null) {
+      $result.messagePane = messagePane;
     }
     return $result;
   }
@@ -861,12 +1038,14 @@ class DashWidget extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, DashWidget_Widget> _DashWidget_WidgetByTag = {
     1 : DashWidget_Widget.lineChart,
     2 : DashWidget_Widget.gauge,
+    3 : DashWidget_Widget.messagePane,
     0 : DashWidget_Widget.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DashWidget', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
-    ..oo(0, [1, 2])
+    ..oo(0, [1, 2, 3])
     ..aOM<LineChartWidget>(1, _omitFieldNames ? '' : 'lineChart', subBuilder: LineChartWidget.create)
     ..aOM<GaugeWidget>(2, _omitFieldNames ? '' : 'gauge', subBuilder: GaugeWidget.create)
+    ..aOM<MessagePaneWidget>(3, _omitFieldNames ? '' : 'messagePane', subBuilder: MessagePaneWidget.create)
     ..hasRequiredFields = false
   ;
 
@@ -915,6 +1094,17 @@ class DashWidget extends $pb.GeneratedMessage {
   void clearGauge() => clearField(2);
   @$pb.TagNumber(2)
   GaugeWidget ensureGauge() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  MessagePaneWidget get messagePane => $_getN(2);
+  @$pb.TagNumber(3)
+  set messagePane(MessagePaneWidget v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasMessagePane() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearMessagePane() => clearField(3);
+  @$pb.TagNumber(3)
+  MessagePaneWidget ensureMessagePane() => $_ensure(2);
 }
 
 /// // Dashboard contains multiple widgets
@@ -1150,8 +1340,8 @@ class Offline extends $pb.GeneratedMessage {
 }
 
 enum ResultError_Error {
-  notFound, 
-  offline, 
+  notFound,
+  offline,
   notSet
 }
 
@@ -1233,8 +1423,8 @@ class ResultError extends $pb.GeneratedMessage {
 }
 
 enum VehicleMetaResult_Result {
-  vehicle, 
-  error, 
+  vehicle,
+  error,
   notSet
 }
 

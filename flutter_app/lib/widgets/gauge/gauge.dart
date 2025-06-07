@@ -1,7 +1,8 @@
 import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:can_ui/widgets/gauge/circular_gauge.dart';
 import 'package:can_ui/widgets/gauge/linear_gauge.dart';
-import 'package:can_ui/widgets/retro_linear_gauge.dart';
+import 'package:can_ui/widgets/gauge/shift_lights.dart';
+import 'package:can_ui/widgets/gauge/retro_linear_gauge.dart';
 import 'package:can_ui/widgets/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -74,6 +75,17 @@ class Gauge extends HookWidget {
     }
     if (gaugeDefn.style.styleType == 'linear') {
       return LinearGauge(
+          label: label,
+          signalName: signalName,
+          maxValue: maxValue,
+          minValue: minValue,
+          width: width,
+          height: height,
+          zones: gaugeDefn.style.zones,
+          value: state.value);
+    }
+    if (gaugeDefn.style.styleType == 'shift_lights') {
+      return ShiftLights(
           label: label,
           signalName: signalName,
           maxValue: maxValue,

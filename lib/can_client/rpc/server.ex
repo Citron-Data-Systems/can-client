@@ -3,9 +3,10 @@ defmodule CanClient.RPC.Server do
     service: CanClient.RPC.Service,
     http_transcode: true
 
+  alias CanClient.FrameHandler.VehicleMetaChannel
   alias CanClient.Rpc.Util
-  alias CanClient.FrameWriter.WorldStateWriter.DefinitionManager
-  alias CanClient.FrameWriter.WorldStateWriter.StateHolder
+  alias CanClient.FrameHandler.WorldStateWriter.DefinitionManager
+  alias CanClient.FrameHandler.WorldStateWriter.StateHolder
   alias GRPC.Server
   require Logger
 
@@ -56,6 +57,31 @@ defmodule CanClient.RPC.Server do
     end
   end
 
+  def publish_text(stream) do
+    receive do
+      {StateHolder, _signal, value} ->
+        Logger.info("Publish Text: #{inspect value}")
+        Server.send_reply(stream, Util.to_text_value(value))
+    end
+
+    publish_text(stream)
+  end
+
+
+  def stream_text(_request, stream) do
+    {_pid, ref} =
+      spawn_monitor(fn ->
+        Logger.info("Streaming text messages from me")
+        StateHolder.sub([VehicleMetaChannel.message_virtual_signal()])
+        publish_text(stream)
+      end)
+
+    receive do
+      {:DOWN, ^ref, :process, _pid, reason} ->
+        Logger.info("Done streaming signals #{inspect(reason)}")
+    end
+  end
+
   defp ok(result_type, key, value) do
     struct(result_type, %{result: {key, value}})
   end
@@ -90,7 +116,7 @@ defmodule CanClient.RPC.Server do
   end
 
   def vehicle_meta(_request, stream) do
-    case DefinitionManager.get_vehicle() do
+    case VehicleMetaChannel.get_vehicle() do
       {:ok, vehicle} ->
         Server.send_reply(
           stream,
@@ -111,7 +137,7 @@ defmodule CanClient.RPC.Server do
     {_, ref} =
       spawn_monitor(fn ->
         Logger.info("Streaming vehicle defs from me")
-        StateHolder.sub([DefinitionManager.emitter_topic()])
+        StateHolder.sub([VehicleMetaChannel.emitter_topic()])
         publish_vehicle_defs(stream)
       end)
 

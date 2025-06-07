@@ -24,6 +24,17 @@ defmodule CanClient.SignalSubscription do
   field :signal, 1, type: :string
 end
 
+defmodule CanClient.TextValue do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  field :value, 1, type: :string
+  field :flash, 3, type: :bool
+  field :backgroundColor, 4, type: :string
+  field :textColor, 5, type: :string
+  field :textSize, 6, type: :string
+end
+
 defmodule CanClient.LayoutInfo do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
@@ -98,6 +109,14 @@ defmodule CanClient.GaugeWidget do
   field :style, 4, type: CanClient.GaugeStyle
 end
 
+defmodule CanClient.MessagePaneWidget do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  field :color, 1, type: :string
+  field :layout, 2, type: CanClient.LayoutInfo
+end
+
 defmodule CanClient.DashWidget do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
@@ -106,6 +125,7 @@ defmodule CanClient.DashWidget do
 
   field :line_chart, 1, type: CanClient.LineChartWidget, json_name: "lineChart", oneof: 0
   field :gauge, 2, type: CanClient.GaugeWidget, oneof: 0
+  field :message_pane, 3, type: CanClient.MessagePaneWidget, json_name: "messagePane", oneof: 0
 end
 
 defmodule CanClient.Dashboard do
@@ -200,6 +220,20 @@ defmodule CanClient.RPC.Service do
         additional_bindings: [],
         response_body: "",
         pattern: {:get, "/streamSignals"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:StreamText, CanClient.Empty, stream(CanClient.TextValue), %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/streamText"},
         __unknown_fields__: []
       }
     }

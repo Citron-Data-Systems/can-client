@@ -16,6 +16,14 @@ message SignalSubscription {
   string signal = 1;
 }
 
+message TextValue {
+  string value = 1;
+  bool flash = 3;
+  string backgroundColor = 4;
+  string textColor = 5;
+  string textSize = 6;
+}
+
 // LayoutInfo represents positioning information in a grid
 message LayoutInfo {
   // X position in grid units
@@ -58,7 +66,6 @@ message LineChartWidget {
   LayoutInfo layout = 3;
 }
 
-
 message GaugeZone {
   double start = 1;
   double end = 2;
@@ -78,12 +85,19 @@ message GaugeWidget {
   GaugeStyle style = 4;
 }
 
+message MessagePaneWidget {
+  string color = 1;
+  LayoutInfo layout = 2;
+}
+
+
 
 // Unified widget message with oneof field
 message DashWidget {
   oneof widget {
     LineChartWidget line_chart = 1;
     GaugeWidget gauge = 2;
+    MessagePaneWidget message_pane = 3;
   }
 }
 
@@ -138,6 +152,12 @@ service RPC {
   rpc StreamSignal (SignalSubscription) returns (stream SignalValue) {
     option (google.api.http) = {
         get: "/streamSignals"
+    };
+  }
+
+  rpc StreamText (Empty) returns (stream TextValue) {
+    option (google.api.http) = {
+        get: "/streamText"
     };
   }
 

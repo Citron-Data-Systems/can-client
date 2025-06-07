@@ -10,6 +10,8 @@ Uses an MCP2515 to read can messages, does stuff with them
   * for fan state or
 
 ### BUGS
+* disconnect and reconnect doesn't restart the definition manager process
+* doesn't restart the phx writer process
 
 ## Notes
 

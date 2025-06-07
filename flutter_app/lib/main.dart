@@ -1,6 +1,7 @@
 import 'package:can_ui/api.dart';
 import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:can_ui/widgets/gauge/gauge.dart';
+import 'package:can_ui/widgets/message_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
@@ -91,9 +92,10 @@ class _Home extends State<MyHomePage> {
       width: layout.w * unitW(),
       height: layout.h * unitH(),
       child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.green, width: 1.0),
-        ),
+        // useful for debugging
+        // decoration: BoxDecoration(
+        //   border: Border.all(color: Colors.green, width: 1.0),
+        // ),
         child: w,
       ),
     );
@@ -119,6 +121,10 @@ class _Home extends State<MyHomePage> {
                   w.lineChart.layout,
                 ),
               );
+            } else if (w.hasMessagePane()) {
+              working.add(_position(
+                  _createMessagePaneWidget(vehicle, w.messagePane),
+                  w.messagePane.layout));
             }
           }
 
@@ -177,6 +183,13 @@ class _Home extends State<MyHomePage> {
 
   Widget _createLineWidget(Vehicle vehicle, LineChartWidget defn) {
     throw UnimplementedError('nope');
+  }
+
+  Widget _createMessagePaneWidget(Vehicle vehicle, MessagePaneWidget defn) {
+    final width = defn.layout.w * unitW();
+    final height = defn.layout.h * unitH();
+
+    return MessagePane(width: width, height: height, defn: defn);
   }
 
   @override

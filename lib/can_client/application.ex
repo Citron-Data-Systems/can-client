@@ -17,8 +17,8 @@ defmodule CanClient.Application do
     def init([]) do
       children = [
         {CanClient.CitronAPI, []},
-        {CanClient.FrameWriter.WorldStateWriter.DefinitionManager, []},
-        {CanClient.FrameWriter.WorldStateWriter.StateHolder, []},
+        {CanClient.FrameHandler.VehicleMetaChannel, []},
+        {CanClient.FrameHandler.WorldStateWriter.StateHolder, []},
       ]
 
       # effectively infinite restarts

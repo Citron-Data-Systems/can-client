@@ -58,6 +58,24 @@ const SignalSubscription$json = {
 final $typed_data.Uint8List signalSubscriptionDescriptor = $convert.base64Decode(
     'ChJTaWduYWxTdWJzY3JpcHRpb24SFgoGc2lnbmFsGAEgASgJUgZzaWduYWw=');
 
+@$core.Deprecated('Use textValueDescriptor instead')
+const TextValue$json = {
+  '1': 'TextValue',
+  '2': [
+    {'1': 'value', '3': 1, '4': 1, '5': 9, '10': 'value'},
+    {'1': 'flash', '3': 3, '4': 1, '5': 8, '10': 'flash'},
+    {'1': 'backgroundColor', '3': 4, '4': 1, '5': 9, '10': 'backgroundColor'},
+    {'1': 'textColor', '3': 5, '4': 1, '5': 9, '10': 'textColor'},
+    {'1': 'textSize', '3': 6, '4': 1, '5': 9, '10': 'textSize'},
+  ],
+};
+
+/// Descriptor for `TextValue`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List textValueDescriptor = $convert.base64Decode(
+    'CglUZXh0VmFsdWUSFAoFdmFsdWUYASABKAlSBXZhbHVlEhQKBWZsYXNoGAMgASgIUgVmbGFzaB'
+    'IoCg9iYWNrZ3JvdW5kQ29sb3IYBCABKAlSD2JhY2tncm91bmRDb2xvchIcCgl0ZXh0Q29sb3IY'
+    'BSABKAlSCXRleHRDb2xvchIaCgh0ZXh0U2l6ZRgGIAEoCVIIdGV4dFNpemU=');
+
 @$core.Deprecated('Use layoutInfoDescriptor instead')
 const LayoutInfo$json = {
   '1': 'LayoutInfo',
@@ -191,12 +209,27 @@ final $typed_data.Uint8List gaugeWidgetDescriptor = $convert.base64Decode(
     'dXQSKwoFc3R5bGUYBCABKAsyFS5DYW5DbGllbnQuR2F1Z2VTdHlsZVIFc3R5bGVCCAoGX3RpdG'
     'xl');
 
+@$core.Deprecated('Use messagePaneWidgetDescriptor instead')
+const MessagePaneWidget$json = {
+  '1': 'MessagePaneWidget',
+  '2': [
+    {'1': 'color', '3': 1, '4': 1, '5': 9, '10': 'color'},
+    {'1': 'layout', '3': 2, '4': 1, '5': 11, '6': '.CanClient.LayoutInfo', '10': 'layout'},
+  ],
+};
+
+/// Descriptor for `MessagePaneWidget`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List messagePaneWidgetDescriptor = $convert.base64Decode(
+    'ChFNZXNzYWdlUGFuZVdpZGdldBIUCgVjb2xvchgBIAEoCVIFY29sb3ISLQoGbGF5b3V0GAIgAS'
+    'gLMhUuQ2FuQ2xpZW50LkxheW91dEluZm9SBmxheW91dA==');
+
 @$core.Deprecated('Use dashWidgetDescriptor instead')
 const DashWidget$json = {
   '1': 'DashWidget',
   '2': [
     {'1': 'line_chart', '3': 1, '4': 1, '5': 11, '6': '.CanClient.LineChartWidget', '9': 0, '10': 'lineChart'},
     {'1': 'gauge', '3': 2, '4': 1, '5': 11, '6': '.CanClient.GaugeWidget', '9': 0, '10': 'gauge'},
+    {'1': 'message_pane', '3': 3, '4': 1, '5': 11, '6': '.CanClient.MessagePaneWidget', '9': 0, '10': 'messagePane'},
   ],
   '8': [
     {'1': 'widget'},
@@ -207,7 +240,8 @@ const DashWidget$json = {
 final $typed_data.Uint8List dashWidgetDescriptor = $convert.base64Decode(
     'CgpEYXNoV2lkZ2V0EjsKCmxpbmVfY2hhcnQYASABKAsyGi5DYW5DbGllbnQuTGluZUNoYXJ0V2'
     'lkZ2V0SABSCWxpbmVDaGFydBIuCgVnYXVnZRgCIAEoCzIWLkNhbkNsaWVudC5HYXVnZVdpZGdl'
-    'dEgAUgVnYXVnZUIICgZ3aWRnZXQ=');
+    'dEgAUgVnYXVnZRJBCgxtZXNzYWdlX3BhbmUYAyABKAsyHC5DYW5DbGllbnQuTWVzc2FnZVBhbm'
+    'VXaWRnZXRIAFILbWVzc2FnZVBhbmVCCAoGd2lkZ2V0');
 
 @$core.Deprecated('Use dashboardDescriptor instead')
 const Dashboard$json = {

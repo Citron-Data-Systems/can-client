@@ -1,9 +1,9 @@
-defmodule CanClient.FrameWriter.PhxChannelWriter do
+defmodule CanClient.FrameHandler.PhxChannelWriter do
   alias CanClient.CitronAPI
-  alias PhoenixClient.Message
+
   require Logger
 
-  @behaviour CanClient.FrameHandler.FrameWriter
+  @behaviour CanClient.FrameHandler.FrameHandler
   @batch_size 30
   def init() do
     pid =
@@ -71,7 +71,7 @@ defmodule CanClient.FrameWriter.PhxChannelWriter do
           )
 
         # blink_frames_sent_to_server()
-        Logger.info("Sent frames #{inspect(res)} #{byte_size(b)} bytes")
+        Logger.info("Sent frames #{inspect(res)} #{byte_size(b)} bytes to #{inspect(channel)}")
         recv_frames(channel)
       other ->
         Logger.warning("Ignoring message #{inspect other}")
@@ -81,10 +81,11 @@ defmodule CanClient.FrameWriter.PhxChannelWriter do
 
 
 
-  defp blink_frames_sent_to_server() do
-    Delux.render(
-      Delux.Effects.number_blink(:red, 5, blink_on_duration: 80, blink_off_duration: 80)
-      |> Map.put(:mode, :one_shot)
-    )
-  end
+  # This is super slow...need to debounce
+  # defp blink_frames_sent_to_server() do
+  #   Delux.render(
+  #     Delux.Effects.number_blink(:red, 5, blink_on_duration: 80, blink_off_duration: 80)
+  #     |> Map.put(:mode, :one_shot)
+  #   )
+  # end
 end

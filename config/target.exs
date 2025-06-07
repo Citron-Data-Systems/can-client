@@ -24,7 +24,7 @@ config :logger, backends: [RingLogger]
 config :can_client,
   # ws_url: "wss://citron.systems/socket/websocket",
   # vehicle_uid: "veh_b5229603-aa80-4f73-ba64-048a830a1a39",
-  ws_url: "wss://33da8f1e8199.ngrok.app/socket/websocket",
+  ws_url: "wss://84a7d87dda2a.ngrok.app/socket/websocket",
   vehicle_uid: "veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006",
   vehicle_meta_location: "/data/vehicle_meta.dets"
 
