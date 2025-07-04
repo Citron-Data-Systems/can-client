@@ -66,7 +66,6 @@ class ShiftLights extends HookWidget {
       duration: const Duration(milliseconds: 180),
       reverseDuration: const Duration(milliseconds: 150),
     );
-    animationController.repeat();
 
     final flashAnimation = useAnimation(
       Tween<double>(begin: 1.0, end: 0.0).animate(

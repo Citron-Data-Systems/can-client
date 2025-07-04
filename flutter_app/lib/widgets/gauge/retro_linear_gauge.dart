@@ -1,10 +1,8 @@
 import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:can_ui/widgets/gauge/gauge.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:math';
-import 'package:can_ui/widgets/util.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 String formatTickLabel(num number) {
@@ -68,7 +66,7 @@ class RetroLinearGauge extends HookWidget {
     final fontSize = max(22.0, height * 0.09);
     final labelLen = (width / fontSize);
     final sigFigs = max(0, 3 - value.toInt().toString().length);
-    final textColor =  getValueColorForZone(value, zones, Colors.white);
+    final textColor = getValueColorForZone(value, zones, Colors.white);
 
     return Container(
       width: width,
@@ -84,21 +82,16 @@ class RetroLinearGauge extends HookWidget {
               children: [
                 Text(
                   label.substring(0, min(label.length, labelLen.floor())),
-                  style: textStyle.copyWith(
-                      fontSize: fontSize,
-                      color: textColor),
+                  style:
+                      textStyle.copyWith(fontSize: fontSize, color: textColor),
                 ),
                 if (showDigitalValue)
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                     alignment: Alignment.centerLeft,
-                    decoration: BoxDecoration(
-                      color: Colors.black45,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.grey.shade700, width: 1),
-                    ),
                     child: Text(value.toStringAsFixed(sigFigs).padLeft(5),
-                        style: textStyle.copyWith(fontSize: fontSize * 1.1, color: textColor)),
+                        style: textStyle.copyWith(
+                            fontSize: fontSize * 1.1, color: textColor)),
                   ),
               ],
             ),
@@ -130,23 +123,6 @@ class RetroLinearGauge extends HookWidget {
               ),
             ),
           ),
-
-          // Tick marks and labels
-          // SizedBox(
-          //   height: height * 0.15,
-          //   child: Padding(
-          //     padding: EdgeInsets.symmetric(horizontal: 8),
-          //     child: CustomPaint(
-          //       painter: RetroGaugeTicksPainter(
-          //         maxValue: maxValue,
-          //         minValue: minValue,
-          //         textColor: accentColor,
-          //         isHorizontal: isHorizontal,
-          //       ),
-          //       size: Size(width - 16, height * 0.15),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

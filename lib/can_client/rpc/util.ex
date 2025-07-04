@@ -13,7 +13,10 @@ defmodule CanClient.Rpc.Util do
       name: name,
       avatar: avatar,
       dbc_defs: Enum.map(dbc_defs, &convert_dbc_def/1),
-      dashboards: Enum.map(dashboards, &convert_dashboard/1),
+      dashboards:
+        dashboards
+        |> Enum.filter(fn d -> Map.get(d, "in_car", true) end)
+        |> Enum.map(&convert_dashboard/1),
       uid: uid
     }
   end

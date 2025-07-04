@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:math';
 
-const fontFamily = 'digital-7';
-
 String formatTickLabel(num number) {
   if (number >= 1000) {
     return '${(number / 1000).toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '')}k';
@@ -26,7 +24,6 @@ class LinearGauge extends HookWidget {
   final Color backgroundColor;
   final Color needleColor;
   final List<GaugeZone> zones;
-  final bool isHorizontal;
   final int numSegments;
   final double segmentSpacing;
   final double segmentBorderRadius;
@@ -44,7 +41,6 @@ class LinearGauge extends HookWidget {
     this.backgroundColor = Colors.black87,
     this.needleColor = Colors.red,
     this.zones = const [],
-    this.isHorizontal = true,
     this.numSegments = 16,
     this.segmentSpacing = 2.0,
     this.segmentBorderRadius = 8.0,
@@ -61,24 +57,12 @@ class LinearGauge extends HookWidget {
     return Container(
       width: width,
       height: height,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade800, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black38,
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Header with label
           Padding(
-            padding: EdgeInsets.fromLTRB(12, 8, 12, 4),
+            padding: EdgeInsets.fromLTRB(12, 4, 12, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -88,7 +72,6 @@ class LinearGauge extends HookWidget {
                     color: textColor,
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
-                    fontFamily: fontFamily,
                   ),
                 ),
                 Container(
@@ -104,7 +87,6 @@ class LinearGauge extends HookWidget {
                       color: textColor,
                       fontSize: height * 0.09,
                       fontWeight: FontWeight.bold,
-                      fontFamily: fontFamily,
                     ),
                   ),
                 ),
@@ -115,7 +97,7 @@ class LinearGauge extends HookWidget {
           // Segment meter
           Expanded(
             child: Padding(
-              padding: EdgeInsets.all(12),
+              padding: EdgeInsets.fromLTRB(12, 4, 12, 4),
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return CustomPaint(
@@ -127,7 +109,6 @@ class LinearGauge extends HookWidget {
                       barColor: barColor,
                       textColor: Colors.white,
                       zones: zones,
-                      isHorizontal: isHorizontal,
                       numSegments: numSegments,
                       segmentSpacing: segmentSpacing,
                       segmentBorderRadius: segmentBorderRadius,
@@ -139,21 +120,22 @@ class LinearGauge extends HookWidget {
           ),
 
           // Tick marks and labels
-          SizedBox(
-            height: height * 0.15,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30),
-              child: CustomPaint(
-                painter: GaugeTicksPainter(
-                  maxValue: maxValue,
-                  minValue: minValue,
-                  textColor: Colors.white,
-                  isHorizontal: isHorizontal,
-                  numSegments: numSegments,
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 2),
+              child: SizedBox(
+                height: height * 0.15,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  child: CustomPaint(
+                    painter: GaugeTicksPainter(
+                      maxValue: maxValue,
+                      minValue: minValue,
+                      textColor: Colors.white,
+                      numSegments: numSegments,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
+              ))
         ],
       ),
     );
@@ -167,7 +149,6 @@ class SegmentGaugePainter extends CustomPainter {
   final Color barColor;
   final Color textColor;
   final List<GaugeZone> zones;
-  final bool isHorizontal;
   final int numSegments;
   final double segmentSpacing;
   final double segmentBorderRadius;
@@ -179,7 +160,6 @@ class SegmentGaugePainter extends CustomPainter {
     required this.barColor,
     required this.textColor,
     required this.zones,
-    required this.isHorizontal,
     required this.numSegments,
     required this.segmentSpacing,
     required this.segmentBorderRadius,
@@ -260,14 +240,12 @@ class GaugeTicksPainter extends CustomPainter {
   final double maxValue;
   final double minValue;
   final Color textColor;
-  final bool isHorizontal;
   final int numSegments;
 
   GaugeTicksPainter({
     required this.maxValue,
     required this.minValue,
     required this.textColor,
-    required this.isHorizontal,
     required this.numSegments,
   });
 
@@ -291,60 +269,29 @@ class GaugeTicksPainter extends CustomPainter {
       final tickValue = minValue + (i * (maxValue - minValue) / (numTicks - 1));
       final tickPosition = i / (numTicks - 1);
 
-      if (isHorizontal) {
-        // Draw tick mark
-        final tickX = size.width * tickPosition;
+      // Draw tick mark
+      final tickX = size.width * tickPosition;
 
-        canvas.drawLine(
-          Offset(tickX, 0),
-          Offset(tickX, size.height * 0.3),
-          tickPaint,
-        );
+      canvas.drawLine(
+        Offset(tickX, 0),
+        Offset(tickX, size.height * 0.3),
+        tickPaint,
+      );
 
-        // Draw label
-        textPainter.text = TextSpan(
-          text: formatTickLabel(tickValue.toInt()),
-          style: TextStyle(
-            color: textColor,
-            fontSize: size.height * 0.7,
-            fontFamily: fontFamily,
-          ),
-        );
+      // Draw label
+      textPainter.text = TextSpan(
+        text: formatTickLabel(tickValue.toInt()),
+        style: TextStyle(
+          color: textColor,
+          fontSize: size.height * 0.7,
+        ),
+      );
 
-        textPainter.layout();
-        textPainter.paint(
-          canvas,
-          Offset(tickX - (textPainter.width / 2), size.height * 0.4),
-        );
-      } else {
-        // Vertical orientation - ticks on the right side
-        final tickY = size.height * (1 - tickPosition);
-
-        canvas.drawLine(
-          Offset(size.width * 0.7, tickY),
-          Offset(size.width, tickY),
-          tickPaint,
-        );
-
-        // Draw label
-        textPainter.text = TextSpan(
-          text: '${tickValue.toInt()}',
-          style: TextStyle(
-            color: textColor,
-            fontSize: size.height * 0.7,
-            fontFamily: fontFamily,
-          ),
-        );
-
-        textPainter.layout();
-        textPainter.paint(
-          canvas,
-          Offset(
-            size.width * 0.5 - textPainter.width / 2,
-            tickY - textPainter.height / 2,
-          ),
-        );
-      }
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(tickX - (textPainter.width / 2), size.height * 0.4),
+      );
     }
   }
 

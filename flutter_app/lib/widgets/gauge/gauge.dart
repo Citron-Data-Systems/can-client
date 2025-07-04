@@ -60,7 +60,7 @@ class Gauge extends HookWidget {
       return () {
         stream.cancel();
       };
-    }, const []);
+    }, [signalName]);
 
     if (gaugeDefn.style.styleType == 'linear_retro') {
       return RetroLinearGauge(

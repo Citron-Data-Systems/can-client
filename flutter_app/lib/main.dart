@@ -1,6 +1,7 @@
 import 'package:can_ui/api.dart';
 import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:can_ui/widgets/gauge/gauge.dart';
+import 'package:can_ui/widgets/line_chart/line_chart.dart';
 import 'package:can_ui/widgets/message_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,25 +21,7 @@ final logger = Logger('CanClientUI');
 
 void main() async {
   setupLogger();
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await windowManager.ensureInitialized();
-  // WindowOptions windowOptions = const WindowOptions(
-  //   size: screenSize,
-  //   center: true,
-  //   backgroundColor: Colors.transparent,
-  //   skipTaskbar: false,
-  //   titleBarStyle: TitleBarStyle.normal,
-  //   windowButtonVisibility: true,
 
-  //   // IRL we probably want:
-  //   // skipTaskbar: true,
-  //   // titleBarStyle: TitleBarStyle.hidden,
-  //   // windowButtonVisibility: false, // TODO
-  // );
-  // windowManager.waitUntilReadyToShow(windowOptions, () async {
-  //   await windowManager.show();
-  //   await windowManager.focus();
-  // });
   logger.info("Starting app");
   runApp(const MyApp());
 }
@@ -151,14 +134,9 @@ class _Home extends State<MyHomePage> {
     );
   }
 
-  Widget _createGaugeWidget(Vehicle vehicle, GaugeWidget defn) {
-    final signalName = defn.columns.first;
-
-    final width = defn.layout.w * unitW();
-    final height = defn.layout.h * unitH();
-
-    double? minValue;
-    double? maxValue;
+  (double, double) _getSignalRange(Vehicle vehicle, String signalName) {
+    double minValue = 0;
+    double maxValue = 0;
     for (var dbc in vehicle.dbcDefs) {
       for (var message in dbc.messages) {
         for (var sig in message.signals) {
@@ -169,20 +147,45 @@ class _Home extends State<MyHomePage> {
         }
       }
     }
+    return (minValue, maxValue);
+  }
+
+  Widget _createGaugeWidget(Vehicle vehicle, GaugeWidget defn) {
+    final signalName = defn.columns.first;
+
+    final width = defn.layout.w * unitW();
+    final height = defn.layout.h * unitH();
+    final (minValue, maxValue) = _getSignalRange(vehicle, signalName);
+
     logger.info("Creating gauge ${defn.title}");
     return Gauge(
       gaugeDefn: defn,
       label: defn.title,
       signalName: signalName,
-      maxValue: maxValue!,
-      minValue: minValue!,
+      maxValue: maxValue,
+      minValue: minValue,
       width: width,
       height: height,
     );
   }
 
   Widget _createLineWidget(Vehicle vehicle, LineChartWidget defn) {
-    throw UnimplementedError('nope');
+    final signalName = defn.columns.first;
+
+    final width = defn.layout.w * unitW();
+    final height = defn.layout.h * unitH();
+    final (minValue, maxValue) = _getSignalRange(vehicle, signalName);
+
+    logger.info("Creating gauge ${defn.title}");
+    return LineChart(
+      gaugeDefn: defn,
+      label: defn.title,
+      signalName: signalName,
+      maxValue: maxValue,
+      minValue: minValue,
+      width: width,
+      height: height,
+    );
   }
 
   Widget _createMessagePaneWidget(Vehicle vehicle, MessagePaneWidget defn) {
