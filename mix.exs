@@ -69,11 +69,13 @@ defmodule CanClient.MixProject do
 
       # {:citron_system_rpi5, github: "Citron-Data-Systems/can-client", runtime: false, targets: :rpi5}
       {:citron_system_rpi5,
-       path: "../nerves_system_rpi5",
+       github: "Citron-Data-Systems/nerves_system_rpi5",
        runtime: false,
        targets: :citron_rpi5,
        nerves: [compile: true]},
-      {:nerves_flutter_support, github: "nerves-flutter/nerves_flutter_support", branch: "digit/package-mesa3d-mesa3d-headers-bump-version-to-25.0.2"}
+      {:nerves_flutter_support,
+       github: "nerves-flutter/nerves_flutter_support",
+       branch: "digit/package-mesa3d-mesa3d-headers-bump-version-to-25.0.2"}
       # {:nerves_system_bbb, "~> 2.19", runtime: false, targets: :bbb},
       # {:nerves_system_osd32mp1, "~> 0.15", runtime: false, targets: :osd32mp1},
       # {:nerves_system_x86_64, "~> 1.24", runtime: false, targets: :x86_64},
