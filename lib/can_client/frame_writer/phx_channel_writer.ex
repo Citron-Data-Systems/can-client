@@ -16,6 +16,7 @@ defmodule CanClient.FrameHandler.PhxChannelWriter do
 
   def handle_frames(frames, {pid, buf}) do
     acc = buf ++ frames
+
     if length(acc) > @batch_size do
       send(pid, {:frames, acc})
       {pid, []}
@@ -26,11 +27,14 @@ defmodule CanClient.FrameHandler.PhxChannelWriter do
 
   def run() do
     topic = "can:#{CanClient.Application.get_vehicle_id()}"
+    Logger.info("Attempt to join #{topic}")
 
+    # if there is a big backlog of frames, just kill them
     clear_frames()
 
     case CitronAPI.join(topic) do
       {:ok, _resp, channel} ->
+        Logger.info("Joined the vehicle channel at #{inspect(channel)}, awaiting frames")
         recv_frames(channel)
 
       fail ->
@@ -43,8 +47,11 @@ defmodule CanClient.FrameHandler.PhxChannelWriter do
   defp clear_frames() do
     receive do
       {:frames, _} ->
-        nil
+        clear_frames()
         # code
+    after
+      0 ->
+        :ok
     end
   end
 
@@ -73,13 +80,12 @@ defmodule CanClient.FrameHandler.PhxChannelWriter do
         # blink_frames_sent_to_server()
         Logger.info("Sent frames #{inspect(res)} #{byte_size(b)} bytes to #{inspect(channel)}")
         recv_frames(channel)
+
       other ->
-        Logger.warning("Ignoring message #{inspect other}")
+        Logger.warning("Ignoring message #{inspect(other)}")
         recv_frames(channel)
     end
   end
-
-
 
   # This is super slow...need to debounce
   # defp blink_frames_sent_to_server() do

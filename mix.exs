@@ -6,7 +6,8 @@ defmodule CanClient.MixProject do
   @all_targets [
     # :host,
     # :rpi5,
-    :citron_rpi5
+    # :citron_rpi5
+    :citron_rpi4
   ]
 
   def project do
@@ -59,28 +60,27 @@ defmodule CanClient.MixProject do
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
       # version updates, please review their release notes in case
       # changes to your application are needed.
-      # {:nerves_system_rpi, "~> 1.24", runtime: false, targets: :rpi},
-      # {:nerves_system_rpi0, "~> 1.24", runtime: false, targets: :rpi0},
-      # {:nerves_system_rpi2, "~> 1.24", runtime: false, targets: :rpi2},
-      # {:nerves_system_rpi3, "~> 1.24", runtime: false, targets: :rpi3},
-      # {:nerves_system_rpi3a, "~> 1.24", runtime: false, targets: :rpi3a},
-      # {:nerves_system_rpi4, "~> 1.24", runtime: false, targets: :rpi4},
-      # {:nerves_system_rpi5, "~> 0.2", runtime: false, targets: :rpi5},
 
-      # {:citron_system_rpi5, github: "Citron-Data-Systems/can-client", runtime: false, targets: :rpi5}
-      {:citron_system_rpi5,
-       github: "Citron-Data-Systems/nerves_system_rpi5",
-       runtime: false,
-       targets: :citron_rpi5,
-       nerves: [compile: true]},
+      # rpi5
+      # {:citron_system_rpi5,
+      #  github: "Citron-Data-Systems/nerves_system_rpi5",
+      #  runtime: false,
+      #  targets: :citron_rpi5,
+      #  nerves: [compile: true]},
+
+      # rpi4
+      {
+        :citron_system_rpi4,
+        #  github: "Citron-Data-Systems/nerves_system_rpi5",
+        path: "../nerves_system_rpi4",
+        runtime: false,
+        targets: :citron_rpi4,
+        nerves: [compile: true]
+      },
+
       {:nerves_flutter_support,
        github: "nerves-flutter/nerves_flutter_support",
        branch: "digit/package-mesa3d-mesa3d-headers-bump-version-to-25.0.2"}
-      # {:nerves_system_bbb, "~> 2.19", runtime: false, targets: :bbb},
-      # {:nerves_system_osd32mp1, "~> 0.15", runtime: false, targets: :osd32mp1},
-      # {:nerves_system_x86_64, "~> 1.24", runtime: false, targets: :x86_64},
-      # {:nerves_system_grisp2, "~> 0.8", runtime: false, targets: :grisp2},
-      # {:nerves_system_mangopi_mq_pro, "~> 0.6", runtime: false, targets: :mangopi_mq_pro}
     ]
   end
 

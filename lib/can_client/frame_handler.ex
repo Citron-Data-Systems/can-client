@@ -107,8 +107,10 @@ defmodule CanClient.FrameHandler do
   def handle_info(:setup, {r_state, _, log}) do
     r_state =
       Enum.reduce(@receivers, r_state, fn mod, acc ->
+        Logger.info("Starting #{inspect mod}")
         # TODO: spawn_monitor here to isolate all the receivers -
         {:ok, state} = mod.init()
+        Logger.info("#{inspect mod} has initialized")
         Map.put(acc, mod, state)
       end)
 
