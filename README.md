@@ -22,6 +22,7 @@ Uses an MCP2515 to read can messages, does stuff with them
 cmd("candump can0")
 
 ### API
+
 #### To add/update an API call
 * edit priv/proto/rpc_schema.proto
 * run ./proto-gen.sh

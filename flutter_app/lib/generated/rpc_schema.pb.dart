@@ -14,6 +14,10 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'rpc_schema.pbenum.dart';
+
+export 'rpc_schema.pbenum.dart';
+
 class Empty extends $pb.GeneratedMessage {
   factory Empty() => create();
   Empty._() : super();
@@ -144,6 +148,102 @@ class SignalValue extends $pb.GeneratedMessage {
   $core.bool hasValue() => $_has(0);
   @$pb.TagNumber(2)
   void clearValue() => clearField(2);
+}
+
+class AlertSubscription extends $pb.GeneratedMessage {
+  factory AlertSubscription() => create();
+  AlertSubscription._() : super();
+  factory AlertSubscription.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AlertSubscription.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AlertSubscription', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  AlertSubscription clone() => AlertSubscription()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  AlertSubscription copyWith(void Function(AlertSubscription) updates) => super.copyWith((message) => updates(message as AlertSubscription)) as AlertSubscription;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AlertSubscription create() => AlertSubscription._();
+  AlertSubscription createEmptyInstance() => create();
+  static $pb.PbList<AlertSubscription> createRepeated() => $pb.PbList<AlertSubscription>();
+  @$core.pragma('dart2js:noInline')
+  static AlertSubscription getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AlertSubscription>(create);
+  static AlertSubscription? _defaultInstance;
+}
+
+class AlertValue extends $pb.GeneratedMessage {
+  factory AlertValue({
+    $core.String? message,
+    AlertLevel? level,
+  }) {
+    final $result = create();
+    if (message != null) {
+      $result.message = message;
+    }
+    if (level != null) {
+      $result.level = level;
+    }
+    return $result;
+  }
+  AlertValue._() : super();
+  factory AlertValue.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AlertValue.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AlertValue', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'message')
+    ..e<AlertLevel>(2, _omitFieldNames ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: AlertLevel.INFO, valueOf: AlertLevel.valueOf, enumValues: AlertLevel.values)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  AlertValue clone() => AlertValue()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  AlertValue copyWith(void Function(AlertValue) updates) => super.copyWith((message) => updates(message as AlertValue)) as AlertValue;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static AlertValue create() => AlertValue._();
+  AlertValue createEmptyInstance() => create();
+  static $pb.PbList<AlertValue> createRepeated() => $pb.PbList<AlertValue>();
+  @$core.pragma('dart2js:noInline')
+  static AlertValue getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AlertValue>(create);
+  static AlertValue? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get message => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set message($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasMessage() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMessage() => clearField(1);
+
+  @$pb.TagNumber(2)
+  AlertLevel get level => $_getN(1);
+  @$pb.TagNumber(2)
+  set level(AlertLevel v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasLevel() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLevel() => clearField(2);
 }
 
 class SignalSubscription extends $pb.GeneratedMessage {
@@ -1006,9 +1106,9 @@ class MessagePaneWidget extends $pb.GeneratedMessage {
 }
 
 enum DashWidget_Widget {
-  lineChart,
-  gauge,
-  messagePane,
+  lineChart, 
+  gauge, 
+  messagePane, 
   notSet
 }
 
@@ -1340,8 +1440,8 @@ class Offline extends $pb.GeneratedMessage {
 }
 
 enum ResultError_Error {
-  notFound,
-  offline,
+  notFound, 
+  offline, 
   notSet
 }
 
@@ -1423,8 +1523,8 @@ class ResultError extends $pb.GeneratedMessage {
 }
 
 enum VehicleMetaResult_Result {
-  vehicle,
-  error,
+  vehicle, 
+  error, 
   notSet
 }
 

@@ -33,6 +33,10 @@ class RPCClient extends $grpc.Client {
       '/CanClient.RPC/StreamSignal',
       ($0.SignalSubscription value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.SignalValue.fromBuffer(value));
+  static final _$streamAlert = $grpc.ClientMethod<$0.AlertSubscription, $0.AlertValue>(
+      '/CanClient.RPC/StreamAlert',
+      ($0.AlertSubscription value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.AlertValue.fromBuffer(value));
   static final _$streamText = $grpc.ClientMethod<$0.Empty, $0.TextValue>(
       '/CanClient.RPC/StreamText',
       ($0.Empty value) => value.writeToBuffer(),
@@ -58,6 +62,10 @@ class RPCClient extends $grpc.Client {
 
   $grpc.ResponseStream<$0.SignalValue> streamSignal($0.SignalSubscription request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$streamSignal, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseStream<$0.AlertValue> streamAlert($0.AlertSubscription request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$streamAlert, $async.Stream.fromIterable([request]), options: options);
   }
 
   $grpc.ResponseStream<$0.TextValue> streamText($0.Empty request, {$grpc.CallOptions? options}) {
@@ -95,6 +103,13 @@ abstract class RPCServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $0.SignalSubscription.fromBuffer(value),
         ($0.SignalValue value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.AlertSubscription, $0.AlertValue>(
+        'StreamAlert',
+        streamAlert_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.AlertSubscription.fromBuffer(value),
+        ($0.AlertValue value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.Empty, $0.TextValue>(
         'StreamText',
         streamText_Pre,
@@ -123,6 +138,10 @@ abstract class RPCServiceBase extends $grpc.Service {
     yield* streamSignal(call, await request);
   }
 
+  $async.Stream<$0.AlertValue> streamAlert_Pre($grpc.ServiceCall call, $async.Future<$0.AlertSubscription> request) async* {
+    yield* streamAlert(call, await request);
+  }
+
   $async.Stream<$0.TextValue> streamText_Pre($grpc.ServiceCall call, $async.Future<$0.Empty> request) async* {
     yield* streamText(call, await request);
   }
@@ -134,6 +153,7 @@ abstract class RPCServiceBase extends $grpc.Service {
   $async.Future<$0.EchoResult> echo($grpc.ServiceCall call, $0.Empty request);
   $async.Stream<$0.EchoResult> streamEcho($grpc.ServiceCall call, $0.Empty request);
   $async.Stream<$0.SignalValue> streamSignal($grpc.ServiceCall call, $0.SignalSubscription request);
+  $async.Stream<$0.AlertValue> streamAlert($grpc.ServiceCall call, $0.AlertSubscription request);
   $async.Stream<$0.TextValue> streamText($grpc.ServiceCall call, $0.Empty request);
   $async.Stream<$0.VehicleMetaResult> vehicleMeta($grpc.ServiceCall call, $0.Empty request);
 }

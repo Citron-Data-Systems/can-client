@@ -1,3 +1,12 @@
+defmodule CanClient.AlertLevel do
+  @moduledoc false
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  field :INFO, 0
+  field :WARN, 1
+  field :ERROR, 2
+end
+
 defmodule CanClient.Empty do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
@@ -15,6 +24,19 @@ defmodule CanClient.SignalValue do
   use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   field :value, 2, type: :float
+end
+
+defmodule CanClient.AlertSubscription do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+end
+
+defmodule CanClient.AlertValue do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  field :message, 1, type: :string
+  field :level, 2, type: CanClient.AlertLevel, enum: true
 end
 
 defmodule CanClient.SignalSubscription do
@@ -220,6 +242,20 @@ defmodule CanClient.RPC.Service do
         additional_bindings: [],
         response_body: "",
         pattern: {:get, "/streamSignals"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:StreamAlert, CanClient.AlertSubscription, stream(CanClient.AlertValue), %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/streamAlerts"},
         __unknown_fields__: []
       }
     }

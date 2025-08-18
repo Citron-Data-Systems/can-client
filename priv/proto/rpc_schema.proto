@@ -12,6 +12,24 @@ message EchoResult {
 message SignalValue {
     float value = 2;
 }
+
+
+
+enum AlertLevel {
+  INFO = 0; 
+  WARN = 1;
+  ERROR = 2;
+}
+
+message AlertSubscription {
+  
+}
+
+message AlertValue {
+    string message = 1;
+    AlertLevel level = 2;
+}
+
 message SignalSubscription {
   string signal = 1;
 }
@@ -152,6 +170,12 @@ service RPC {
   rpc StreamSignal (SignalSubscription) returns (stream SignalValue) {
     option (google.api.http) = {
         get: "/streamSignals"
+    };
+  }
+
+  rpc StreamAlert (AlertSubscription) returns (stream AlertValue) {
+    option (google.api.http) = {
+        get: "/streamAlerts"
     };
   }
 

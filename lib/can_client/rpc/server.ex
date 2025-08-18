@@ -5,7 +5,6 @@ defmodule CanClient.RPC.Server do
 
   alias CanClient.FrameHandler.VehicleMetaChannel
   alias CanClient.Rpc.Util
-  alias CanClient.FrameHandler.WorldStateWriter.DefinitionManager
   alias CanClient.FrameHandler.WorldStateWriter.StateHolder
   alias GRPC.Server
   require Logger

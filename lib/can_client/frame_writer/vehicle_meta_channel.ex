@@ -61,11 +61,23 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
           []
       end
     end)
-    |> Enum.each(fn parsed ->
-      Enum.each(Map.keys(parsed.message), fn can_id ->
-        :ets.insert(__MODULE__, {{@dbc_definition, can_id}, parsed})
-      end)
+    |> Enum.each(&load_dbc/1)
+
+    LuaIn
+    Map.get(v_def, "scripts", [])
+    |> Enum.each(fn s ->
+      load_script(s)
     end)
+  end
+
+  defp load_dbc(parsed) do
+    Enum.each(Map.keys(parsed.message), fn can_id ->
+      :ets.insert(__MODULE__, {{@dbc_definition, can_id}, parsed})
+    end)
+  end
+
+  defp load_script(s) do
+
   end
 
   defp save_def(dets_tab, v_def) do
@@ -83,9 +95,11 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
 
   def handle_info(%PhoenixClient.Message{event: "message", payload: message}, state) do
     Logger.info("Got message #{inspect(message)}")
+
     StateHolder.pub([
       {message_virtual_signal(), message}
     ])
+
     {:noreply, state}
   end
 

@@ -13,7 +13,8 @@ defmodule CanClient.FrameHandler do
 
   @receivers [
     PhxChannelWriter,
-    WorldStateWriter
+    WorldStateWriter,
+    LuaWriter
   ]
 
   def start_link(_) do

@@ -55,6 +55,7 @@ defmodule CanClient.MixProject do
       {:grpc, "~> 0.9"},
       {:protobuf_generate, "~> 0.1.1"},
       {:canbus, github: "rozap/canbus"},
+      {:lua, "~> 0.3.0"},
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang

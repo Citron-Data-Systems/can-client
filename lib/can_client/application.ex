@@ -19,6 +19,8 @@ defmodule CanClient.Application do
         {CanClient.CitronAPI, []},
         {CanClient.FrameHandler.VehicleMetaChannel, []},
         {CanClient.FrameHandler.WorldStateWriter.StateHolder, []},
+        {CanClient.LuaRunner, []},
+        {DynamicSupervisor, name: CanClient.LuaRunner.Supervisor, strategy: :one_for_one}
       ]
 
       # effectively infinite restarts

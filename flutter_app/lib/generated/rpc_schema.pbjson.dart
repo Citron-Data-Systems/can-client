@@ -13,6 +13,20 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use alertLevelDescriptor instead')
+const AlertLevel$json = {
+  '1': 'AlertLevel',
+  '2': [
+    {'1': 'INFO', '2': 0},
+    {'1': 'WARN', '2': 1},
+    {'1': 'ERROR', '2': 2},
+  ],
+};
+
+/// Descriptor for `AlertLevel`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List alertLevelDescriptor = $convert.base64Decode(
+    'CgpBbGVydExldmVsEggKBElORk8QABIICgRXQVJOEAESCQoFRVJST1IQAg==');
+
 @$core.Deprecated('Use emptyDescriptor instead')
 const Empty$json = {
   '1': 'Empty',
@@ -45,6 +59,29 @@ const SignalValue$json = {
 /// Descriptor for `SignalValue`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List signalValueDescriptor = $convert.base64Decode(
     'CgtTaWduYWxWYWx1ZRIUCgV2YWx1ZRgCIAEoAlIFdmFsdWU=');
+
+@$core.Deprecated('Use alertSubscriptionDescriptor instead')
+const AlertSubscription$json = {
+  '1': 'AlertSubscription',
+};
+
+/// Descriptor for `AlertSubscription`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List alertSubscriptionDescriptor = $convert.base64Decode(
+    'ChFBbGVydFN1YnNjcmlwdGlvbg==');
+
+@$core.Deprecated('Use alertValueDescriptor instead')
+const AlertValue$json = {
+  '1': 'AlertValue',
+  '2': [
+    {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
+    {'1': 'level', '3': 2, '4': 1, '5': 14, '6': '.CanClient.AlertLevel', '10': 'level'},
+  ],
+};
+
+/// Descriptor for `AlertValue`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List alertValueDescriptor = $convert.base64Decode(
+    'CgpBbGVydFZhbHVlEhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2USKwoFbGV2ZWwYAiABKA4yFS'
+    '5DYW5DbGllbnQuQWxlcnRMZXZlbFIFbGV2ZWw=');
 
 @$core.Deprecated('Use signalSubscriptionDescriptor instead')
 const SignalSubscription$json = {
