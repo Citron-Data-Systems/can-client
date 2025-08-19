@@ -92,22 +92,24 @@ defmodule LuaInterpreterTest do
       on_signal("foo", doit)
       """
 
+      name = "mycoolscript.lua"
+
       :ok =
-        LuaRunner.spawn(script)
+        LuaRunner.spawn(name, script)
 
       StateHolder.pub([
         {"foo", 1},
         {"foo", 2}
       ])
 
-      og_pid = LuaRunner.whereis(script)
+      og_pid = LuaRunner.whereis(name)
       await_x(og_pid, fn x -> x == 2 end)
 
-      LuaRunner.whereis(script) |> Process.exit(:die)
+      LuaRunner.whereis(name) |> Process.exit(:die)
 
-      await(fn -> og_pid != LuaRunner.whereis(script) end, 1000)
+      await(fn -> og_pid != LuaRunner.whereis(name) end, 1000)
 
-      new_pid = LuaRunner.whereis(script)
+      new_pid = LuaRunner.whereis(name)
       await_x(new_pid, fn x -> x == 0 end)
     end
   end

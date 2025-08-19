@@ -3,6 +3,7 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
   alias CanClient.CitronAPI
   use GenServer
   require Logger
+  alias CanClient.LuaRunner
 
   defmodule State do
     defstruct [:dets_tab]
@@ -63,7 +64,6 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
     end)
     |> Enum.each(&load_dbc/1)
 
-    LuaIn
     Map.get(v_def, "scripts", [])
     |> Enum.each(fn s ->
       load_script(s)
@@ -76,8 +76,9 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
     end)
   end
 
-  defp load_script(s) do
-
+  defp load_script(%{"content" => script, "name" => name}) do
+    Logger.info("Asking for start of script #{name}")
+    LuaRunner.spawn(name, script)
   end
 
   defp save_def(dets_tab, v_def) do

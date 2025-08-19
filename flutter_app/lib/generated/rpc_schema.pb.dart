@@ -154,6 +154,7 @@ class AlertEvent extends $pb.GeneratedMessage {
   factory AlertEvent({
     $core.String? message,
     AlertLevel? level,
+    $core.int? timeSeconds,
   }) {
     final $result = create();
     if (message != null) {
@@ -161,6 +162,9 @@ class AlertEvent extends $pb.GeneratedMessage {
     }
     if (level != null) {
       $result.level = level;
+    }
+    if (timeSeconds != null) {
+      $result.timeSeconds = timeSeconds;
     }
     return $result;
   }
@@ -171,6 +175,7 @@ class AlertEvent extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AlertEvent', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'message')
     ..e<AlertLevel>(2, _omitFieldNames ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: AlertLevel.INFO, valueOf: AlertLevel.valueOf, enumValues: AlertLevel.values)
+    ..a<$core.int>(3, _omitFieldNames ? '' : 'timeSeconds', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -212,6 +217,15 @@ class AlertEvent extends $pb.GeneratedMessage {
   $core.bool hasLevel() => $_has(1);
   @$pb.TagNumber(2)
   void clearLevel() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get timeSeconds => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set timeSeconds($core.int v) { $_setSignedInt32(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasTimeSeconds() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearTimeSeconds() => clearField(3);
 }
 
 class TextEvent extends $pb.GeneratedMessage {

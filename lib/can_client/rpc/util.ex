@@ -177,7 +177,7 @@ defmodule CanClient.Rpc.Util do
       }) do
     %CanClient.EventValue{
       event: {
-        :message_event,
+        :text_event,
         %CanClient.TextEvent{
           message: message,
           backgroundColor: background_color,
@@ -189,21 +189,27 @@ defmodule CanClient.Rpc.Util do
     }
   end
 
-  def to_event(%{
-        "type" => "alert",
-        "payload" => %{
-          "level" => level,
-          "message" => message
-        }
-      }) do
-    %CanClient.EventValue{
-      event: {
-        :alert_event,
-        %CanClient.AlertEvent{
-          level: level,
-          message: message
-        }
-      }
-    }
-  end
+  # Guh this encoding module is so dumb
+  # def to_event(%{
+  #       "type" => "alert",
+  #       "payload" => %{
+  #         "level" => level,
+  #         "message" => message
+  #       }
+  #     }) do
+  #   level =
+
+
+  #   %CanClient.EventValue{
+  #     event: {
+  #       :alert_event,
+  #       %CanClient.AlertEvent{
+  #         level: level,
+  #         message: message
+  #       }
+  #     }
+  #   }
+  # end
+
+  def to_event(%{__struct__: _} = already_encoded), do: already_encoded
 end

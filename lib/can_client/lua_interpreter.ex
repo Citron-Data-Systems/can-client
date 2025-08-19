@@ -6,6 +6,7 @@ defmodule CanClient.LuaInterpreter do
   defmodule API do
     use Lua.API
     alias CanClient.FrameHandler.WorldStateWriter.StateHolder
+    alias CanClient.FrameHandler.VehicleMetaChannel
 
     deflua get_value(signal_name) do
       1
@@ -31,8 +32,42 @@ defmodule CanClient.LuaInterpreter do
       "ok"
     end
 
-    deflua show_alert(message, options) do
-      "TODO"
+    defp dispatch_event(event) do
+      Logger.info("Dispatching event")
+
+      StateHolder.pub([
+        {
+          VehicleMetaChannel.event_virtual_signal(),
+          event
+        }
+      ])
+    end
+
+    deflua show_alert(message, level, time) do
+      level =
+        case String.downcase(String.trim(level)) do
+          "info" ->
+            :INFO
+          "warn" ->
+            :WARN
+          "error" ->
+            :ERROR
+          _ ->
+            :INFO
+        end
+
+      dispatch_event(%CanClient.EventValue{
+        event: {
+          :alert_event,
+          %CanClient.AlertEvent{
+            level: level,
+            message: message,
+            time_seconds: time
+          }
+        }
+      })
+
+      "ok"
     end
 
     deflua on_tick(interval, callback) do
@@ -45,13 +80,13 @@ defmodule CanClient.LuaInterpreter do
     defstruct [:lua, :timers]
   end
 
-  def start_link(), do: start_link([nil])
+  def start_link(), do: start_link([nil, nil])
 
-  def start_link([script]) do
-    GenServer.start_link(__MODULE__, [script])
+  def start_link([name, script]) do
+    GenServer.start_link(__MODULE__, [name, script])
   end
 
-  def init([script]) do
+  def init([name, script]) do
     lua = Lua.new() |> Lua.load_api(API)
     state = %State{lua: lua, timers: %{}}
 
@@ -60,7 +95,7 @@ defmodule CanClient.LuaInterpreter do
         {:ok, state}
 
       script ->
-        LuaRunner.register(script)
+        LuaRunner.register(name)
         Logger.info("Starting script \n--\n#{script}\n--")
         {_res, state} = eval(script, state)
         {:ok, state}

@@ -13,10 +13,8 @@ message SignalValue {
     float value = 2;
 }
 
-
-
 enum AlertLevel {
-  INFO = 0; 
+  INFO = 0;
   WARN = 1;
   ERROR = 2;
 }
@@ -24,6 +22,7 @@ enum AlertLevel {
 message AlertEvent {
     string message = 1;
     AlertLevel level = 2;
+    int32 time_seconds = 3;
 }
 
 message TextEvent {

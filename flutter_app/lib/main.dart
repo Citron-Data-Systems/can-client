@@ -1,3 +1,4 @@
+import 'package:can_ui/alert.dart';
 import 'package:can_ui/api.dart';
 import 'package:can_ui/generated/rpc_schema.pb.dart';
 import 'package:can_ui/widgets/gauge/gauge.dart';
@@ -246,6 +247,8 @@ class _Home extends State<MyHomePage> {
                 ),
               ),
               // Other children in the outer stack...
+
+              FloatingAlert(key: Key("global-alert")),
             ],
           ));
     }

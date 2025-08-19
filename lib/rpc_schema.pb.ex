@@ -32,6 +32,7 @@ defmodule CanClient.AlertEvent do
 
   field :message, 1, type: :string
   field :level, 2, type: CanClient.AlertLevel, enum: true
+  field :time_seconds, 3, type: :int32, json_name: "timeSeconds"
 end
 
 defmodule CanClient.TextEvent do

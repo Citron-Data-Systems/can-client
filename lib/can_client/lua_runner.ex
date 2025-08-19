@@ -11,54 +11,70 @@ defmodule CanClient.LuaRunner do
     {:ok, %{}}
   end
 
-  def handle_cast({:register, script, pid}, state) do
-    {:noreply, Map.put(state, script, pid)}
+  defp shutdown_existing(state, name) do
+    case Map.pop(state, name) do
+      {nil, state} ->
+        {:noproc, state}
+
+      {pid, state} ->
+        Logger.info("Shutting down #{name} @ #{inspect(pid)}")
+        LuaInterpreter.shutdown(pid)
+        {:ok, state}
+    end
+  end
+
+  def handle_cast({:register, name, pid}, state) do
+    Logger.info("Script #{name} has registered as pid #{inspect(pid)}")
+    {:noreply, Map.put(state, name, pid)}
   end
 
   def handle_call(:shutdown_all, _, interpreters) do
-    Enum.each(interpreters, fn _k, pid ->
+    Enum.each(interpreters, fn k, pid ->
+      Logger.info("Shutting down #{k}\n #{inspect(pid)}")
       LuaInterpreter.shutdown(pid)
-      Logger.info("Shutdown #{inspect(pid)}")
     end)
   end
 
-  def handle_call({:whereis, script}, _, state) do
-    {:reply, Map.get(state, script), state}
+  def handle_call({:whereis, name}, _, state) do
+    {:reply, Map.get(state, name), state}
   end
 
-  def handle_call({:spawn, script}, _, state) do
-    {res, state} =
-      with {:ok, pid} <-
-             DynamicSupervisor.start_child(
-               CanClient.LuaRunner.Supervisor,
-               {LuaInterpreter, [script]}
-             ) do
-        Logger.info("Started script at #{inspect(pid)}")
-        {:ok, state}
-      else
-        other -> {other, state}
-      end
+  def handle_call({:spawn, name, script}, _, state) do
+    {_res, state} = shutdown_existing(state, name)
 
+    Logger.info("Spawning script...")
+
+    started =
+      DynamicSupervisor.start_child(
+        CanClient.LuaRunner.Supervisor,
+        %{
+          id: "script_#{name}",
+          start: {LuaInterpreter, :start_link, [[name, script]]},
+          max_restarts: 1000,
+          max_seconds: 60,
+          restart: :transient
+        }
+      )
+
+    case started do
+      {:ok, pid} ->
+        Logger.info("Started #{name} @ #{inspect(pid)}")
+        {:reply, :ok, state}
+
+      other ->
+        Logger.error("Failed to start script\n#{inspect(other)}")
+        {:reply, other, state}
+    end
+  end
+
+  def handle_call({:exit, name}, _, state) do
+    {res, state} = shutdown_existing(state, name)
     {:reply, res, state}
   end
 
-  def handle_call({:exit, script}, _, state) do
-    {res, state} =
-      case Map.pop(state, script) do
-        {nil, state} ->
-          {:noproc, state}
-
-        {pid, state} ->
-          LuaInterpreter.shutdown(pid)
-          {:ok, state}
-      end
-
-    {:reply, res, state}
-  end
-
-  def handle_call({:run_in, script, expr}, _, state) do
+  def handle_call({:run_in, name, expr}, _, state) do
     res =
-      case Map.get(state, script) do
+      case Map.get(state, name) do
         nil ->
           :noproc
 
@@ -69,24 +85,24 @@ defmodule CanClient.LuaRunner do
     {:reply, res, state}
   end
 
-  def spawn(script) do
-    GenServer.call(__MODULE__, {:spawn, script})
+  def spawn(name, script) do
+    GenServer.call(__MODULE__, {:spawn, name, script})
   end
 
-  def whereis(script) do
-    GenServer.call(__MODULE__, {:whereis, script})
+  def whereis(name) do
+    GenServer.call(__MODULE__, {:whereis, name})
   end
 
-  def register(script) do
-    GenServer.cast(__MODULE__, {:register, script, self()})
+  def register(name) do
+    GenServer.cast(__MODULE__, {:register, name, self()})
   end
 
-  def run_in(script, expr) do
-    GenServer.call(__MODULE__, {:run_in, script, expr})
+  def run_in(name, expr) do
+    GenServer.call(__MODULE__, {:run_in, name, expr})
   end
 
-  def exit(script) do
-    GenServer.call(__MODULE__, {:exit, script})
+  def exit(name) do
+    GenServer.call(__MODULE__, {:exit, name})
   end
 
   def shutdown_all() do

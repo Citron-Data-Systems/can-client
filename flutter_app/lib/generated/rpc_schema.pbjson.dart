@@ -66,13 +66,15 @@ const AlertEvent$json = {
   '2': [
     {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
     {'1': 'level', '3': 2, '4': 1, '5': 14, '6': '.CanClient.AlertLevel', '10': 'level'},
+    {'1': 'time_seconds', '3': 3, '4': 1, '5': 5, '10': 'timeSeconds'},
   ],
 };
 
 /// Descriptor for `AlertEvent`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List alertEventDescriptor = $convert.base64Decode(
     'CgpBbGVydEV2ZW50EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2USKwoFbGV2ZWwYAiABKA4yFS'
-    '5DYW5DbGllbnQuQWxlcnRMZXZlbFIFbGV2ZWw=');
+    '5DYW5DbGllbnQuQWxlcnRMZXZlbFIFbGV2ZWwSIQoMdGltZV9zZWNvbmRzGAMgASgFUgt0aW1l'
+    'U2Vjb25kcw==');
 
 @$core.Deprecated('Use textEventDescriptor instead')
 const TextEvent$json = {

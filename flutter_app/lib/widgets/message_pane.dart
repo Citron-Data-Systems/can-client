@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:can_ui/api.dart';
 
+const BackgrounColorDefault = '#000000';
+
 class MessagePane extends HookWidget {
   final double width;
   final double height;
@@ -17,7 +19,7 @@ class MessagePane extends HookWidget {
   @override
   Widget build(BuildContext context) {
     var state = useState(TextEvent(
-        backgroundColor: '#000000',
+        backgroundColor: BackgrounColorDefault,
         flash: false,
         textColor: '#ffffff',
         message: 'No Message',
@@ -32,7 +34,16 @@ class MessagePane extends HookWidget {
       stream.listen(
         (data) {
           if (data.hasTextEvent()) {
-            state.value = data.textEvent;
+            if (data.textEvent.message.trim().isEmpty) {
+              state.value = TextEvent(
+                  backgroundColor: BackgrounColorDefault,
+                  flash: false,
+                  textColor: '#ffffff',
+                  message: '',
+                  textSize: 'medium');
+            } else {
+              state.value = data.textEvent;
+            }
           }
         },
         onError: (error) => {},

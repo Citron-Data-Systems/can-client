@@ -16,11 +16,15 @@ defmodule CanClient.Application do
     @impl true
     def init([]) do
       children = [
+        {DynamicSupervisor,
+         name: CanClient.LuaRunner.Supervisor,
+         strategy: :one_for_one,
+         max_restarts: 100_000,
+         max_seconds: 1},
+        {CanClient.LuaRunner, []},
         {CanClient.CitronAPI, []},
         {CanClient.FrameHandler.VehicleMetaChannel, []},
-        {CanClient.FrameHandler.WorldStateWriter.StateHolder, []},
-        {CanClient.LuaRunner, []},
-        {DynamicSupervisor, name: CanClient.LuaRunner.Supervisor, strategy: :one_for_one}
+        {CanClient.FrameHandler.WorldStateWriter.StateHolder, []}
       ]
 
       # effectively infinite restarts
@@ -61,7 +65,7 @@ defmodule CanClient.Application do
     dri_card = get_output_card()
 
     launch_env = %{
-      "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}",
+      "FLUTTER_DRM_DEVICE" => "/dev/dri/#{dri_card}"
       # "GALLIUM_HUD" => "cpu+fps",
       # "GALLIUM_HUD_PERIOD" => "0.25",
       # "GALLIUM_HUD_SCALE" => "3",
@@ -83,13 +87,9 @@ defmodule CanClient.Application do
       NervesFlutterSupport.Flutter.Engine.create_child(
         app_name: :can_client,
         env: launch_env,
-        args: [
-
-        ]
+        args: []
       )
     ]
-
-
   end
 
   defp get_output_card() do
