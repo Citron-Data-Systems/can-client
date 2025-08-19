@@ -14,7 +14,7 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
 
   def emitter_topic(), do: "__vehicle_defn"
 
-  def message_virtual_signal(), do: "__vmessage"
+  def event_virtual_signal(), do: "__vevent"
 
   defp dets_name(), do: :vehicle_defn
   @vehicle_definition :vehicle_def
@@ -93,11 +93,11 @@ defmodule CanClient.FrameHandler.VehicleMetaChannel do
     {:noreply, state}
   end
 
-  def handle_info(%PhoenixClient.Message{event: "message", payload: message}, state) do
-    Logger.info("Got message #{inspect(message)}")
+  def handle_info(%PhoenixClient.Message{event: "event", payload: message}, state) do
+    Logger.info("Got event #{inspect(message)}")
 
     StateHolder.pub([
-      {message_virtual_signal(), message}
+      {event_virtual_signal(), message}
     ])
 
     {:noreply, state}

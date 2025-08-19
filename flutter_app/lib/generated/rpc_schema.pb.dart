@@ -150,40 +150,8 @@ class SignalValue extends $pb.GeneratedMessage {
   void clearValue() => clearField(2);
 }
 
-class AlertSubscription extends $pb.GeneratedMessage {
-  factory AlertSubscription() => create();
-  AlertSubscription._() : super();
-  factory AlertSubscription.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory AlertSubscription.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AlertSubscription', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  AlertSubscription clone() => AlertSubscription()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  AlertSubscription copyWith(void Function(AlertSubscription) updates) => super.copyWith((message) => updates(message as AlertSubscription)) as AlertSubscription;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static AlertSubscription create() => AlertSubscription._();
-  AlertSubscription createEmptyInstance() => create();
-  static $pb.PbList<AlertSubscription> createRepeated() => $pb.PbList<AlertSubscription>();
-  @$core.pragma('dart2js:noInline')
-  static AlertSubscription getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AlertSubscription>(create);
-  static AlertSubscription? _defaultInstance;
-}
-
-class AlertValue extends $pb.GeneratedMessage {
-  factory AlertValue({
+class AlertEvent extends $pb.GeneratedMessage {
+  factory AlertEvent({
     $core.String? message,
     AlertLevel? level,
   }) {
@@ -196,11 +164,11 @@ class AlertValue extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  AlertValue._() : super();
-  factory AlertValue.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory AlertValue.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AlertEvent._() : super();
+  factory AlertEvent.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AlertEvent.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AlertValue', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AlertEvent', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'message')
     ..e<AlertLevel>(2, _omitFieldNames ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: AlertLevel.INFO, valueOf: AlertLevel.valueOf, enumValues: AlertLevel.values)
     ..hasRequiredFields = false
@@ -210,22 +178,22 @@ class AlertValue extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  AlertValue clone() => AlertValue()..mergeFromMessage(this);
+  AlertEvent clone() => AlertEvent()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  AlertValue copyWith(void Function(AlertValue) updates) => super.copyWith((message) => updates(message as AlertValue)) as AlertValue;
+  AlertEvent copyWith(void Function(AlertEvent) updates) => super.copyWith((message) => updates(message as AlertEvent)) as AlertEvent;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static AlertValue create() => AlertValue._();
-  AlertValue createEmptyInstance() => create();
-  static $pb.PbList<AlertValue> createRepeated() => $pb.PbList<AlertValue>();
+  static AlertEvent create() => AlertEvent._();
+  AlertEvent createEmptyInstance() => create();
+  static $pb.PbList<AlertEvent> createRepeated() => $pb.PbList<AlertEvent>();
   @$core.pragma('dart2js:noInline')
-  static AlertValue getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AlertValue>(create);
-  static AlertValue? _defaultInstance;
+  static AlertEvent getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AlertEvent>(create);
+  static AlertEvent? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get message => $_getSZ(0);
@@ -244,6 +212,195 @@ class AlertValue extends $pb.GeneratedMessage {
   $core.bool hasLevel() => $_has(1);
   @$pb.TagNumber(2)
   void clearLevel() => clearField(2);
+}
+
+class TextEvent extends $pb.GeneratedMessage {
+  factory TextEvent({
+    $core.String? message,
+    $core.bool? flash,
+    $core.String? backgroundColor,
+    $core.String? textColor,
+    $core.String? textSize,
+  }) {
+    final $result = create();
+    if (message != null) {
+      $result.message = message;
+    }
+    if (flash != null) {
+      $result.flash = flash;
+    }
+    if (backgroundColor != null) {
+      $result.backgroundColor = backgroundColor;
+    }
+    if (textColor != null) {
+      $result.textColor = textColor;
+    }
+    if (textSize != null) {
+      $result.textSize = textSize;
+    }
+    return $result;
+  }
+  TextEvent._() : super();
+  factory TextEvent.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TextEvent.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TextEvent', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'message')
+    ..aOB(3, _omitFieldNames ? '' : 'flash')
+    ..aOS(4, _omitFieldNames ? '' : 'backgroundColor', protoName: 'backgroundColor')
+    ..aOS(5, _omitFieldNames ? '' : 'textColor', protoName: 'textColor')
+    ..aOS(6, _omitFieldNames ? '' : 'textSize', protoName: 'textSize')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  TextEvent clone() => TextEvent()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TextEvent copyWith(void Function(TextEvent) updates) => super.copyWith((message) => updates(message as TextEvent)) as TextEvent;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static TextEvent create() => TextEvent._();
+  TextEvent createEmptyInstance() => create();
+  static $pb.PbList<TextEvent> createRepeated() => $pb.PbList<TextEvent>();
+  @$core.pragma('dart2js:noInline')
+  static TextEvent getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TextEvent>(create);
+  static TextEvent? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get message => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set message($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasMessage() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMessage() => clearField(1);
+
+  @$pb.TagNumber(3)
+  $core.bool get flash => $_getBF(1);
+  @$pb.TagNumber(3)
+  set flash($core.bool v) { $_setBool(1, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasFlash() => $_has(1);
+  @$pb.TagNumber(3)
+  void clearFlash() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get backgroundColor => $_getSZ(2);
+  @$pb.TagNumber(4)
+  set backgroundColor($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasBackgroundColor() => $_has(2);
+  @$pb.TagNumber(4)
+  void clearBackgroundColor() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get textColor => $_getSZ(3);
+  @$pb.TagNumber(5)
+  set textColor($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasTextColor() => $_has(3);
+  @$pb.TagNumber(5)
+  void clearTextColor() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get textSize => $_getSZ(4);
+  @$pb.TagNumber(6)
+  set textSize($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasTextSize() => $_has(4);
+  @$pb.TagNumber(6)
+  void clearTextSize() => clearField(6);
+}
+
+enum EventValue_Event {
+  alertEvent, 
+  textEvent, 
+  notSet
+}
+
+class EventValue extends $pb.GeneratedMessage {
+  factory EventValue({
+    AlertEvent? alertEvent,
+    TextEvent? textEvent,
+  }) {
+    final $result = create();
+    if (alertEvent != null) {
+      $result.alertEvent = alertEvent;
+    }
+    if (textEvent != null) {
+      $result.textEvent = textEvent;
+    }
+    return $result;
+  }
+  EventValue._() : super();
+  factory EventValue.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory EventValue.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static const $core.Map<$core.int, EventValue_Event> _EventValue_EventByTag = {
+    1 : EventValue_Event.alertEvent,
+    2 : EventValue_Event.textEvent,
+    0 : EventValue_Event.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EventValue', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..aOM<AlertEvent>(1, _omitFieldNames ? '' : 'alertEvent', subBuilder: AlertEvent.create)
+    ..aOM<TextEvent>(2, _omitFieldNames ? '' : 'textEvent', subBuilder: TextEvent.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  EventValue clone() => EventValue()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  EventValue copyWith(void Function(EventValue) updates) => super.copyWith((message) => updates(message as EventValue)) as EventValue;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static EventValue create() => EventValue._();
+  EventValue createEmptyInstance() => create();
+  static $pb.PbList<EventValue> createRepeated() => $pb.PbList<EventValue>();
+  @$core.pragma('dart2js:noInline')
+  static EventValue getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<EventValue>(create);
+  static EventValue? _defaultInstance;
+
+  EventValue_Event whichEvent() => _EventValue_EventByTag[$_whichOneof(0)]!;
+  void clearEvent() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  AlertEvent get alertEvent => $_getN(0);
+  @$pb.TagNumber(1)
+  set alertEvent(AlertEvent v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasAlertEvent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAlertEvent() => clearField(1);
+  @$pb.TagNumber(1)
+  AlertEvent ensureAlertEvent() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  TextEvent get textEvent => $_getN(1);
+  @$pb.TagNumber(2)
+  set textEvent(TextEvent v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasTextEvent() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearTextEvent() => clearField(2);
+  @$pb.TagNumber(2)
+  TextEvent ensureTextEvent() => $_ensure(1);
 }
 
 class SignalSubscription extends $pb.GeneratedMessage {
@@ -294,112 +451,6 @@ class SignalSubscription extends $pb.GeneratedMessage {
   $core.bool hasSignal() => $_has(0);
   @$pb.TagNumber(1)
   void clearSignal() => clearField(1);
-}
-
-class TextValue extends $pb.GeneratedMessage {
-  factory TextValue({
-    $core.String? value,
-    $core.bool? flash,
-    $core.String? backgroundColor,
-    $core.String? textColor,
-    $core.String? textSize,
-  }) {
-    final $result = create();
-    if (value != null) {
-      $result.value = value;
-    }
-    if (flash != null) {
-      $result.flash = flash;
-    }
-    if (backgroundColor != null) {
-      $result.backgroundColor = backgroundColor;
-    }
-    if (textColor != null) {
-      $result.textColor = textColor;
-    }
-    if (textSize != null) {
-      $result.textSize = textSize;
-    }
-    return $result;
-  }
-  TextValue._() : super();
-  factory TextValue.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory TextValue.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TextValue', package: const $pb.PackageName(_omitMessageNames ? '' : 'CanClient'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'value')
-    ..aOB(3, _omitFieldNames ? '' : 'flash')
-    ..aOS(4, _omitFieldNames ? '' : 'backgroundColor', protoName: 'backgroundColor')
-    ..aOS(5, _omitFieldNames ? '' : 'textColor', protoName: 'textColor')
-    ..aOS(6, _omitFieldNames ? '' : 'textSize', protoName: 'textSize')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  TextValue clone() => TextValue()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  TextValue copyWith(void Function(TextValue) updates) => super.copyWith((message) => updates(message as TextValue)) as TextValue;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static TextValue create() => TextValue._();
-  TextValue createEmptyInstance() => create();
-  static $pb.PbList<TextValue> createRepeated() => $pb.PbList<TextValue>();
-  @$core.pragma('dart2js:noInline')
-  static TextValue getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TextValue>(create);
-  static TextValue? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get value => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set value($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasValue() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearValue() => clearField(1);
-
-  @$pb.TagNumber(3)
-  $core.bool get flash => $_getBF(1);
-  @$pb.TagNumber(3)
-  set flash($core.bool v) { $_setBool(1, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasFlash() => $_has(1);
-  @$pb.TagNumber(3)
-  void clearFlash() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.String get backgroundColor => $_getSZ(2);
-  @$pb.TagNumber(4)
-  set backgroundColor($core.String v) { $_setString(2, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasBackgroundColor() => $_has(2);
-  @$pb.TagNumber(4)
-  void clearBackgroundColor() => clearField(4);
-
-  @$pb.TagNumber(5)
-  $core.String get textColor => $_getSZ(3);
-  @$pb.TagNumber(5)
-  set textColor($core.String v) { $_setString(3, v); }
-  @$pb.TagNumber(5)
-  $core.bool hasTextColor() => $_has(3);
-  @$pb.TagNumber(5)
-  void clearTextColor() => clearField(5);
-
-  @$pb.TagNumber(6)
-  $core.String get textSize => $_getSZ(4);
-  @$pb.TagNumber(6)
-  set textSize($core.String v) { $_setString(4, v); }
-  @$pb.TagNumber(6)
-  $core.bool hasTextSize() => $_has(4);
-  @$pb.TagNumber(6)
-  void clearTextSize() => clearField(6);
 }
 
 /// LayoutInfo represents positioning information in a grid

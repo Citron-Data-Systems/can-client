@@ -9,29 +9,8 @@ defmodule CanClient.RPC.Server do
   alias GRPC.Server
   require Logger
 
-  @doc """
-  gRPC function used to fetch basic system information
-  """
-  def echo(_request, _stream) do
-    %CanClient.EchoResult{
-      message: "bugs"
-    }
-  end
 
-  defp sendit(stream, i) do
-    Server.send_reply(stream, %CanClient.EchoResult{
-      message: "hello #{i}"
-    })
-
-    Process.sleep(500)
-    sendit(stream, i + 1)
-  end
-
-  def stream_echo(_request, stream) do
-    sendit(stream, 0)
-  end
-
-  def publish_signals(stream) do
+  defp publish_signals(stream) do
     receive do
       {StateHolder, _signal, value} ->
         Server.send_reply(stream, %CanClient.SignalValue{
@@ -56,23 +35,23 @@ defmodule CanClient.RPC.Server do
     end
   end
 
-  def publish_text(stream) do
+  def publish_event(stream) do
     receive do
       {StateHolder, _signal, value} ->
-        Logger.info("Publish Text: #{inspect value}")
-        Server.send_reply(stream, Util.to_text_value(value))
+        Logger.info("Publish Event: #{inspect value}")
+        Server.send_reply(stream, Util.to_event(value))
     end
 
-    publish_text(stream)
+    publish_event(stream)
   end
 
 
-  def stream_text(_request, stream) do
+  def stream_event(_request, stream) do
     {_pid, ref} =
       spawn_monitor(fn ->
-        Logger.info("Streaming text messages from me")
-        StateHolder.sub([VehicleMetaChannel.message_virtual_signal()])
-        publish_text(stream)
+        Logger.info("Streaming events from me")
+        StateHolder.sub([VehicleMetaChannel.event_virtual_signal()])
+        publish_event(stream)
       end)
 
     receive do

@@ -26,12 +26,7 @@ defmodule CanClient.SignalValue do
   field :value, 2, type: :float
 end
 
-defmodule CanClient.AlertSubscription do
-  @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
-end
-
-defmodule CanClient.AlertValue do
+defmodule CanClient.AlertEvent do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
@@ -39,22 +34,32 @@ defmodule CanClient.AlertValue do
   field :level, 2, type: CanClient.AlertLevel, enum: true
 end
 
+defmodule CanClient.TextEvent do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  field :message, 1, type: :string
+  field :flash, 3, type: :bool
+  field :backgroundColor, 4, type: :string
+  field :textColor, 5, type: :string
+  field :textSize, 6, type: :string
+end
+
+defmodule CanClient.EventValue do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
+
+  oneof :event, 0
+
+  field :alert_event, 1, type: CanClient.AlertEvent, json_name: "alertEvent", oneof: 0
+  field :text_event, 2, type: CanClient.TextEvent, json_name: "textEvent", oneof: 0
+end
+
 defmodule CanClient.SignalSubscription do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
 
   field :signal, 1, type: :string
-end
-
-defmodule CanClient.TextValue do
-  @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.1", syntax: :proto3
-
-  field :value, 1, type: :string
-  field :flash, 3, type: :bool
-  field :backgroundColor, 4, type: :string
-  field :textColor, 5, type: :string
-  field :textSize, 6, type: :string
 end
 
 defmodule CanClient.LayoutInfo do
@@ -205,34 +210,6 @@ defmodule CanClient.RPC.Service do
 
   use GRPC.Service, name: "CanClient.RPC", protoc_gen_elixir_version: "0.14.1"
 
-  rpc(:Echo, CanClient.Empty, CanClient.EchoResult, %{
-    http: %{
-      type: Google.Api.PbExtension,
-      value: %Google.Api.HttpRule{
-        selector: "",
-        body: "",
-        additional_bindings: [],
-        response_body: "",
-        pattern: {:get, "/echo"},
-        __unknown_fields__: []
-      }
-    }
-  })
-
-  rpc(:StreamEcho, CanClient.Empty, stream(CanClient.EchoResult), %{
-    http: %{
-      type: Google.Api.PbExtension,
-      value: %Google.Api.HttpRule{
-        selector: "",
-        body: "",
-        additional_bindings: [],
-        response_body: "",
-        pattern: {:get, "/streamEcho"},
-        __unknown_fields__: []
-      }
-    }
-  })
-
   rpc(:StreamSignal, CanClient.SignalSubscription, stream(CanClient.SignalValue), %{
     http: %{
       type: Google.Api.PbExtension,
@@ -247,7 +224,7 @@ defmodule CanClient.RPC.Service do
     }
   })
 
-  rpc(:StreamAlert, CanClient.AlertSubscription, stream(CanClient.AlertValue), %{
+  rpc(:StreamEvent, CanClient.Empty, stream(CanClient.EventValue), %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{
@@ -255,21 +232,7 @@ defmodule CanClient.RPC.Service do
         body: "",
         additional_bindings: [],
         response_body: "",
-        pattern: {:get, "/streamAlerts"},
-        __unknown_fields__: []
-      }
-    }
-  })
-
-  rpc(:StreamText, CanClient.Empty, stream(CanClient.TextValue), %{
-    http: %{
-      type: Google.Api.PbExtension,
-      value: %Google.Api.HttpRule{
-        selector: "",
-        body: "",
-        additional_bindings: [],
-        response_body: "",
-        pattern: {:get, "/streamText"},
+        pattern: {:get, "/events"},
         __unknown_fields__: []
       }
     }

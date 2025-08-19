@@ -45,7 +45,7 @@ defmodule CanClient.LuaInterpreter do
     defstruct [:lua, :timers]
   end
 
-  def start_link(), do: start_link(nil)
+  def start_link(), do: start_link([nil])
 
   def start_link([script]) do
     GenServer.start_link(__MODULE__, [script])
@@ -60,9 +60,8 @@ defmodule CanClient.LuaInterpreter do
         {:ok, state}
 
       script ->
-        Logger.info("I am registering")
         LuaRunner.register(script)
-        Logger.info("Starting now")
+        Logger.info("Starting script \n--\n#{script}\n--")
         {_res, state} = eval(script, state)
         {:ok, state}
     end

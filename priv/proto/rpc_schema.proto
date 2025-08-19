@@ -21,26 +21,34 @@ enum AlertLevel {
   ERROR = 2;
 }
 
-message AlertSubscription {
-  
-}
-
-message AlertValue {
+message AlertEvent {
     string message = 1;
     AlertLevel level = 2;
 }
 
-message SignalSubscription {
-  string signal = 1;
-}
-
-message TextValue {
-  string value = 1;
+message TextEvent {
+  string message = 1;
   bool flash = 3;
   string backgroundColor = 4;
   string textColor = 5;
   string textSize = 6;
 }
+
+
+message EventValue {
+  oneof event {
+    AlertEvent alert_event = 1;
+    TextEvent text_event = 2;
+
+  }
+}
+
+
+
+message SignalSubscription {
+  string signal = 1;
+}
+
 
 // LayoutInfo represents positioning information in a grid
 message LayoutInfo {
@@ -155,33 +163,15 @@ message VehicleMetaResult {
 
 // The actual RPC service definition with HTTP/2 endpoints defined
 service RPC {
-  rpc Echo (Empty) returns (EchoResult) {
-    option (google.api.http) = {
-        get: "/echo"
-    };
-  }
-
-  rpc StreamEcho (Empty) returns (stream EchoResult) {
-    option (google.api.http) = {
-        get: "/streamEcho"
-    };
-  }
-
   rpc StreamSignal (SignalSubscription) returns (stream SignalValue) {
     option (google.api.http) = {
         get: "/streamSignals"
     };
   }
 
-  rpc StreamAlert (AlertSubscription) returns (stream AlertValue) {
+  rpc StreamEvent (Empty) returns (stream EventValue) {
     option (google.api.http) = {
-        get: "/streamAlerts"
-    };
-  }
-
-  rpc StreamText (Empty) returns (stream TextValue) {
-    option (google.api.http) = {
-        get: "/streamText"
+        get: "/events"
     };
   }
 

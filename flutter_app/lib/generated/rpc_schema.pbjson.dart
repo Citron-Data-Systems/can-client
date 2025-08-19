@@ -60,28 +60,55 @@ const SignalValue$json = {
 final $typed_data.Uint8List signalValueDescriptor = $convert.base64Decode(
     'CgtTaWduYWxWYWx1ZRIUCgV2YWx1ZRgCIAEoAlIFdmFsdWU=');
 
-@$core.Deprecated('Use alertSubscriptionDescriptor instead')
-const AlertSubscription$json = {
-  '1': 'AlertSubscription',
-};
-
-/// Descriptor for `AlertSubscription`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List alertSubscriptionDescriptor = $convert.base64Decode(
-    'ChFBbGVydFN1YnNjcmlwdGlvbg==');
-
-@$core.Deprecated('Use alertValueDescriptor instead')
-const AlertValue$json = {
-  '1': 'AlertValue',
+@$core.Deprecated('Use alertEventDescriptor instead')
+const AlertEvent$json = {
+  '1': 'AlertEvent',
   '2': [
     {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
     {'1': 'level', '3': 2, '4': 1, '5': 14, '6': '.CanClient.AlertLevel', '10': 'level'},
   ],
 };
 
-/// Descriptor for `AlertValue`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List alertValueDescriptor = $convert.base64Decode(
-    'CgpBbGVydFZhbHVlEhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2USKwoFbGV2ZWwYAiABKA4yFS'
+/// Descriptor for `AlertEvent`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List alertEventDescriptor = $convert.base64Decode(
+    'CgpBbGVydEV2ZW50EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2USKwoFbGV2ZWwYAiABKA4yFS'
     '5DYW5DbGllbnQuQWxlcnRMZXZlbFIFbGV2ZWw=');
+
+@$core.Deprecated('Use textEventDescriptor instead')
+const TextEvent$json = {
+  '1': 'TextEvent',
+  '2': [
+    {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
+    {'1': 'flash', '3': 3, '4': 1, '5': 8, '10': 'flash'},
+    {'1': 'backgroundColor', '3': 4, '4': 1, '5': 9, '10': 'backgroundColor'},
+    {'1': 'textColor', '3': 5, '4': 1, '5': 9, '10': 'textColor'},
+    {'1': 'textSize', '3': 6, '4': 1, '5': 9, '10': 'textSize'},
+  ],
+};
+
+/// Descriptor for `TextEvent`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List textEventDescriptor = $convert.base64Decode(
+    'CglUZXh0RXZlbnQSGAoHbWVzc2FnZRgBIAEoCVIHbWVzc2FnZRIUCgVmbGFzaBgDIAEoCFIFZm'
+    'xhc2gSKAoPYmFja2dyb3VuZENvbG9yGAQgASgJUg9iYWNrZ3JvdW5kQ29sb3ISHAoJdGV4dENv'
+    'bG9yGAUgASgJUgl0ZXh0Q29sb3ISGgoIdGV4dFNpemUYBiABKAlSCHRleHRTaXpl');
+
+@$core.Deprecated('Use eventValueDescriptor instead')
+const EventValue$json = {
+  '1': 'EventValue',
+  '2': [
+    {'1': 'alert_event', '3': 1, '4': 1, '5': 11, '6': '.CanClient.AlertEvent', '9': 0, '10': 'alertEvent'},
+    {'1': 'text_event', '3': 2, '4': 1, '5': 11, '6': '.CanClient.TextEvent', '9': 0, '10': 'textEvent'},
+  ],
+  '8': [
+    {'1': 'event'},
+  ],
+};
+
+/// Descriptor for `EventValue`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List eventValueDescriptor = $convert.base64Decode(
+    'CgpFdmVudFZhbHVlEjgKC2FsZXJ0X2V2ZW50GAEgASgLMhUuQ2FuQ2xpZW50LkFsZXJ0RXZlbn'
+    'RIAFIKYWxlcnRFdmVudBI1Cgp0ZXh0X2V2ZW50GAIgASgLMhQuQ2FuQ2xpZW50LlRleHRFdmVu'
+    'dEgAUgl0ZXh0RXZlbnRCBwoFZXZlbnQ=');
 
 @$core.Deprecated('Use signalSubscriptionDescriptor instead')
 const SignalSubscription$json = {
@@ -94,24 +121,6 @@ const SignalSubscription$json = {
 /// Descriptor for `SignalSubscription`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List signalSubscriptionDescriptor = $convert.base64Decode(
     'ChJTaWduYWxTdWJzY3JpcHRpb24SFgoGc2lnbmFsGAEgASgJUgZzaWduYWw=');
-
-@$core.Deprecated('Use textValueDescriptor instead')
-const TextValue$json = {
-  '1': 'TextValue',
-  '2': [
-    {'1': 'value', '3': 1, '4': 1, '5': 9, '10': 'value'},
-    {'1': 'flash', '3': 3, '4': 1, '5': 8, '10': 'flash'},
-    {'1': 'backgroundColor', '3': 4, '4': 1, '5': 9, '10': 'backgroundColor'},
-    {'1': 'textColor', '3': 5, '4': 1, '5': 9, '10': 'textColor'},
-    {'1': 'textSize', '3': 6, '4': 1, '5': 9, '10': 'textSize'},
-  ],
-};
-
-/// Descriptor for `TextValue`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List textValueDescriptor = $convert.base64Decode(
-    'CglUZXh0VmFsdWUSFAoFdmFsdWUYASABKAlSBXZhbHVlEhQKBWZsYXNoGAMgASgIUgVmbGFzaB'
-    'IoCg9iYWNrZ3JvdW5kQ29sb3IYBCABKAlSD2JhY2tncm91bmRDb2xvchIcCgl0ZXh0Q29sb3IY'
-    'BSABKAlSCXRleHRDb2xvchIaCgh0ZXh0U2l6ZRgGIAEoCVIIdGV4dFNpemU=');
 
 @$core.Deprecated('Use layoutInfoDescriptor instead')
 const LayoutInfo$json = {

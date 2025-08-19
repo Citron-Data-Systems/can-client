@@ -27,26 +27,18 @@ class API {
     );
   }
 
-  static Future<EchoResult> echo() async {
-    return await _client!.echo(Empty());
-  }
-
   static ResponseStream<SignalValue> streamSignals(String signal) {
     return _client!.streamSignal(
       SignalSubscription(signal: signal),
     );
   }
 
-  static ResponseStream<EchoResult> streamEcho() {
-    return _client!.streamEcho(Empty());
-  }
-
   static ResponseStream<VehicleMetaResult> vehicleMeta() {
     return _client!.vehicleMeta(Empty());
   }
 
-  static ResponseStream<TextValue> streamText() {
-    return _client!.streamText(Empty());
+  static ResponseStream<EventValue> streamEvent() {
+    return _client!.streamEvent(Empty());
   }
 
 }

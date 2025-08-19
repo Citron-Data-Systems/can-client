@@ -165,19 +165,45 @@ defmodule CanClient.Rpc.Util do
     }
   end
 
-  def to_text_value(%{
-        "message" => value,
-        "textColor" => text_color,
-        "backgroundColor" => background_color,
-        "textSize" => size,
-        "flash" => flash
+  def to_event(%{
+        "type" => "message",
+        "payload" => %{
+          "message" => message,
+          "textColor" => text_color,
+          "backgroundColor" => background_color,
+          "textSize" => size,
+          "flash" => flash
+        }
       }) do
-    %CanClient.TextValue{
-      value: value,
-      textColor: text_color,
-      backgroundColor: background_color,
-      flash: flash,
-      textSize: size
+    %CanClient.EventValue{
+      event: {
+        :message_event,
+        %CanClient.TextEvent{
+          message: message,
+          backgroundColor: background_color,
+          flash: flash,
+          textColor: text_color,
+          textSize: size
+        }
+      }
+    }
+  end
+
+  def to_event(%{
+        "type" => "alert",
+        "payload" => %{
+          "level" => level,
+          "message" => message
+        }
+      }) do
+    %CanClient.EventValue{
+      event: {
+        :alert_event,
+        %CanClient.AlertEvent{
+          level: level,
+          message: message
+        }
+      }
     }
   end
 end

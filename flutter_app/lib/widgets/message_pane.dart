@@ -16,22 +16,24 @@ class MessagePane extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    var state = useState(TextValue(
+    var state = useState(TextEvent(
         backgroundColor: '#000000',
         flash: false,
         textColor: '#ffffff',
-        value: 'No Message',
+        message: 'No Message',
         textSize: 'medium'));
 
     useEffect(() {
       API.updateBaseURI();
 
       // needs to match VehicleMetaChannel
-      final stream = API.streamText();
+      final stream = API.streamEvent();
 
       stream.listen(
         (data) {
-          state.value = data;
+          if (data.hasTextEvent()) {
+            state.value = data.textEvent;
+          }
         },
         onError: (error) => {},
         onDone: () => {},
@@ -82,7 +84,7 @@ class MessagePane extends HookWidget {
         color:
             hexToColor(state.value.backgroundColor).withOpacity(flashAnimation),
         child: Text(
-          state.value.value,
+          state.value.message,
           style: TextStyle(
               color: hexToColor(state.value.textColor), fontSize: fontSize),
         ));
