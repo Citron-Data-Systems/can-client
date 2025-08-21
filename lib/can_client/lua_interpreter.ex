@@ -8,8 +8,11 @@ defmodule CanClient.LuaInterpreter do
     alias CanClient.FrameHandler.WorldStateWriter.StateHolder
     alias CanClient.FrameHandler.VehicleMetaChannel
 
-    deflua get_value(signal_name) do
-      1
+    deflua get_signal(signal_name) do
+      case StateHolder.get(signal_name) do
+        {:ok, value} -> value
+        _ -> nil
+      end
     end
 
     defp signal_loop(owner, callback) do
@@ -33,8 +36,6 @@ defmodule CanClient.LuaInterpreter do
     end
 
     defp dispatch_event(event) do
-      Logger.info("Dispatching event")
-
       StateHolder.pub([
         {
           VehicleMetaChannel.event_virtual_signal(),
@@ -43,18 +44,25 @@ defmodule CanClient.LuaInterpreter do
       ])
     end
 
+    defp into_level(level) do
+      case String.downcase(String.trim(level)) do
+        "info" ->
+          :INFO
+
+        "warn" ->
+          :WARN
+
+        "error" ->
+          :ERROR
+
+        _ ->
+          :INFO
+      end
+    end
+
     deflua show_alert(message, level, time) do
       level =
-        case String.downcase(String.trim(level)) do
-          "info" ->
-            :INFO
-          "warn" ->
-            :WARN
-          "error" ->
-            :ERROR
-          _ ->
-            :INFO
-        end
+        into_level(level)
 
       dispatch_event(%CanClient.EventValue{
         event: {
@@ -66,6 +74,41 @@ defmodule CanClient.LuaInterpreter do
           }
         }
       })
+
+      "ok"
+    end
+
+    deflua show_message(message, background_color, text_color, flash, size) do
+      dispatch_event(%CanClient.EventValue{
+        event: {
+          :text_event,
+          %CanClient.TextEvent{
+            message: message,
+            backgroundColor: background_color,
+            flash: flash,
+            textColor: text_color,
+            textSize: size
+          }
+        }
+      })
+
+      "ok"
+    end
+
+    deflua log(level, message) do
+      case into_level(level) do
+        :INFO ->
+          Logger.info(message)
+
+        :WARN ->
+          Logger.warning(message)
+
+        :ERROR ->
+          Logger.error(message)
+
+        _ ->
+          Logger.info(message)
+      end
 
       "ok"
     end

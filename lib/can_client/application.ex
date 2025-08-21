@@ -24,7 +24,8 @@ defmodule CanClient.Application do
         {CanClient.LuaRunner, []},
         {CanClient.CitronAPI, []},
         {CanClient.FrameHandler.VehicleMetaChannel, []},
-        {CanClient.FrameHandler.WorldStateWriter.StateHolder, []}
+        {CanClient.FrameHandler.WorldStateWriter.StateHolder, []},
+        {CanClient.LogMessageForwarder, []}
       ]
 
       # effectively infinite restarts
@@ -34,6 +35,8 @@ defmodule CanClient.Application do
 
   @impl true
   def start(_type, _args) do
+    CanClient.LogMessageHandler.attach()
+
     grpc_server =
       {GRPC.Server.Supervisor, endpoint: CanClient.RPC.Endpoint, port: 50051, start_server: true}
 

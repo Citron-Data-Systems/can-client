@@ -19,7 +19,6 @@ config :logger, :console,
     :signal_name
   ]
 
-
 config :can_client,
   ws_url: "ws://localhost:4020/socket/websocket",
   vehicle_uid: "veh_bb3e5caf-5849-4ee8-bed5-b12c3c160006",

@@ -108,7 +108,7 @@ defmodule CanClient.MockFrameHandler do
   SG_ CylAM : 0|16@1+ (1,0) [0|0] "mg" Vector__XXX
   SG_ EstMAF : 16|16@1+ (0.01,0) [0|0] "kg/h" Vector__XXX
   SG_ InjPW : 32|16@1+ (0.003333333,0) [0|0] "ms" Vector__XXX
-  SG_ KnockCt : 48|16@1+ (1,0) [0|0] "count" Vector__XXX
+  SG_ KnockCt : 48|16@1+ (1,0) [0|100] "count" Vector__XXX
 
   BO_ 518 BASE6: 8 Vector__XXX
   SG_ FuelUsed : 0|16@1+ (1,0) [0|0] "g" Vector__XXX
@@ -281,12 +281,14 @@ defmodule CanClient.MockFrameHandler do
   def handle_info(:frames, {FrameHandler, dbc, t} = state) do
     pid = Process.whereis(FrameHandler)
     fake = gen_random(dbc, t)
+    # IO.inspect(fake)
     send(pid, {:frames, fake})
     {:noreply, state}
   end
 
   def handle_info(:frames, {state, dbc, t}) do
     fake = gen_random(dbc, t)
+    # IO.inspect fake
 
     new_state =
       Enum.reduce(state, state, fn {mod, r_state}, acc ->

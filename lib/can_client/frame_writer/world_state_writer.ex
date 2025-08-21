@@ -42,8 +42,8 @@ defmodule CanClient.FrameHandler.WorldStateWriter do
       {:noreply, {ws, subscriptions}}
     end
 
-    def handle_call(:get, {ws, _} = state) do
-      {:reply, {:ok, ws}, state}
+    def handle_call({:get, signal}, _from, {ws, _} = state) do
+      {:reply, {:ok, Map.get(ws, signal)}, state}
     end
 
     def handle_info({:DOWN, _ref, :process, pid, _reason}, {ws, subscriptions}) do
@@ -56,8 +56,8 @@ defmodule CanClient.FrameHandler.WorldStateWriter do
       {:noreply, {ws, subscriptions}}
     end
 
-    def get() do
-      GenServer.call(__MODULE__, :get)
+    def get(signal) do
+      GenServer.call(__MODULE__, {:get, signal})
     end
 
     defp resubscribe_forever(topics, subscriber) do
